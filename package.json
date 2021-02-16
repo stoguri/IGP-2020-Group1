@@ -1,0 +1,27 @@
+{
+  "name": "trafficsurveillanceappgui",
+  "version": "1.0.0",
+  "description": "A web interface for a traffic surveillance application",
+  "main": "index.js",
+  "scripts": {
+    "test": "test",
+    "start": "node server/server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stoguri/IGP-2020-Group1.git"
+  },
+  "author": "ipg-2020-group1",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/stoguri/IGP-2020-Group1/issues"
+  },
+  "homepage": "https://github.com/stoguri/IGP-2020-Group1#readme",
+  "dependencies": {
+    "auth0": "^2.33.0",
+    "express": "^4.17.1",
+    "express-session": "^1.17.1",
+    "passport": "^0.4.1",
+    "passport-auth0": "^1.4.0"
+  }
+}
