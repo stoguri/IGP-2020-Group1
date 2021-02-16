@@ -36,7 +36,7 @@ app.get('/login', passport.authenticate('auth0', {
 }))
 
 app.get('/callback', passport.authenticate('auth0'), (req, res) => {
-    console.log("callback time");
     req.session.user = req.user;
+    console.log(req.session.user.displayName + " authenticated.");
     res.redirect('/');
 });
