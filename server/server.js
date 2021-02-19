@@ -30,13 +30,41 @@ app.use(passport.initialize());
 
 app.use(passport.session());
 
-app.get('/login', passport.authenticate('auth0', {
-    // define what user info is sent
-    scope: 'openid profile',
-}))
+/**
+ * Login using auth0 strategy
+ */
+app.get('/auth/login/auth0', passport.authenticate('auth0', {
+        // define what user info is sent
+        scope: ['openid', 'profile'],
+    }
+));
 
-app.get('/callback', passport.authenticate('auth0'), (req, res) => {
+app.get('/auth/callback', passport.authenticate('auth0'), (req, res) => {
     req.session.user = req.user;
+    req.session.auth = true;
+
     console.log(req.session.user.displayName + " authenticated.");
+
     res.redirect('/');
+});
+
+app.get('/auth/logout', (req, res) => {
+    req.session.destroy(function (err) {
+        res.redirect('/');
+        res.end();
+    });
+});
+
+// %%% authentication routes & functions %%%
+
+/**
+ * check if the user has an authenticated session
+ * @response {status}
+ */
+app.get('/auth/authCheck', (req, res) => {
+    if(req.session.auth) {
+        res.sendStatus(204);
+    } else {
+        res.sendStatus(403);
+    }
 });

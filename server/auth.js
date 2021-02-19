@@ -1,4 +1,4 @@
-'use strict'
+'use strict';
 
 const passport = require('passport');
 const Auth0Strategy = require('passport-auth0');
@@ -19,7 +19,7 @@ passport.use(new Auth0Strategy(
         domain: config.network.domain,
         clientID: config.auth.clientID,
         clientSecret: config.auth.clientSecret,
-        callbackURL: `http://${config.auth.callbackDomain}:${config.network.port}/callback`
+        callbackURL: `http://${config.auth.callbackDomain}:${config.network.port}/auth/callback`
     }, 
     (accessToken, refreshToken, extraParams, profile, done) => {
         return done(null, profile);
