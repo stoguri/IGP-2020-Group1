@@ -10,9 +10,6 @@ async function logout() {
     const response = await fetch('auth/logout');
     if(response.ok) {
         console.log("Logged out.");
-
-        // reload page
-        //await boot();
     } else {
         console.error("Failed to log out.");
     }

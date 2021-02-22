@@ -3,10 +3,10 @@
 async function boot() {
     if(await checkAuth()) {
         // display main page
-        console.log("logged in")
+        generatePage_main();
     } else {
         // display login splash screen
-        console.log("not logged in");
+        generatePage_splash();
     }
 }
 
