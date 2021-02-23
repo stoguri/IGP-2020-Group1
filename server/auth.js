@@ -16,10 +16,10 @@ passport.deserializeUser(function(user, done) {
 
 passport.use(new Auth0Strategy(
     {
-        domain: config.network.domain,
+        domain: config.auth.domain,
         clientID: config.auth.clientID,
         clientSecret: config.auth.clientSecret,
-        callbackURL: `http://${config.auth.callbackDomain}:${config.network.port}/auth/callback`
+        callbackURL: `http://${config.network.domain}:${config.network.port}/auth/callback`
     }, 
     (accessToken, refreshToken, extraParams, profile, done) => {
         return done(null, profile);

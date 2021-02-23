@@ -7,8 +7,8 @@ To set up user authentication go to <https://manage.auth0.com/>.
 
 1. Create a single page web application.
 2. Go to application settings.
-3. Put %YOURDOMAIN%/auth/callback in the "Allowed Callbacks URLs" box.
-4. Put %YOURDOMAIN%/auth/logout in the "Allowed Logout URLs" box.
+3. Put %YOURDOMAIN%:%YOURPORT%/auth/callback in the "Allowed Callbacks URLs" box.
+4. Put %YOURDOMAIN%:%YOURPORT%/auth/logout in the "Allowed Logout URLs" box.
 5. Save changes.
 
 # Running the application
@@ -33,13 +33,13 @@ Create the config.json file in the server directory.
 ```json
 {
     "network": {
-        "domain": "from auth0",
+        "domain": "user defined",
         "port": "user defined"
     },
     "auth": {
         "clientID": "from auth0",
         "clientSecret": "from auth0",
-        "callbackDomain": "user defined"
+        "domain": "from auth0"
     },
     "testMode": "set to true to run in test mode"
 }
