@@ -74,3 +74,39 @@ app.get('/auth/authCheck', (req, res) => {
 app.get('/api/test', (req, res) => {
     res.json({"field1": "value1", "field2": "value2"});
 });
+
+// %%% demo and debug functions %%%
+app.get("demo/rgbToHex", function(req, res) {
+    const red   = parseInt(req.query.red, 10);
+    const green = parseInt(req.query.green, 10);
+    const blue  = parseInt(req.query.blue, 10);
+    const hex = converter.rgbToHex(red, green, blue);
+    res.send(hex);
+});
+  
+app.get("demo/hexToRgb", function(req, res) {
+    const hex = req.query.hex;
+    const rgb = converter.hexToRgb(hex);
+    res.send(JSON.stringify(rgb));
+});
+
+// same as functions from clientside test
+function rgbToHex(red, green, blue) {
+    const redHex   = red.toString(16);
+    const greenHex = green.toString(16);
+    const blueHex  = blue.toString(16);
+  
+    return pad(redHex) + pad(greenHex) + pad(blueHex);
+  };
+  
+function pad(hex) {
+    return (hex.length === 1 ? "0" + hex : hex);
+}
+
+function hexToRgb(hex) {
+    const red   = parseInt(hex.substring(0, 2), 16);
+    const green = parseInt(hex.substring(2, 4), 16);
+    const blue  = parseInt(hex.substring(4, 6), 16);
+
+    return [red, green, blue];
+};
