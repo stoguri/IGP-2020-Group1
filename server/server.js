@@ -68,3 +68,9 @@ app.get('/auth/authCheck', (req, res) => {
         res.sendStatus(403);
     }
 });
+
+// %%% data routes and functions %%%
+
+app.get('/api/test', (req, res) => {
+    res.json({"field1": "value1", "field2": "value2"});
+});
