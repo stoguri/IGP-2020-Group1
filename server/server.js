@@ -71,11 +71,24 @@ app.get('/auth/authCheck', (req, res) => {
 
 // %%% data routes and functions %%%
 
-app.get('/api/test', (req, res) => {
-    res.json({"field1": "value1", "field2": "value2"});
+// DB functions
+const db = require('./db/main.js');
+
+/** 
+ * increments count field in the record related to given entrance id
+ * for when a new vehicle comes through one of the entrances
+ * @param {integer} req.query.entrance id of entrance to be incremented
+ */
+app.put('/api/entrance/increment', async (req, res) => {
+    const status = await db.incrementEntrance(req.query.entrance);
+    res.sendStatus(status);
 });
 
 // %%% demo and debug functions %%%
+app.get('/debug/test', (req, res) => {
+    res.json({"field1": "value1", "field2": "value2"});
+});
+
 app.get("demo/rgbToHex", function(req, res) {
     const red   = parseInt(req.query.red, 10);
     const green = parseInt(req.query.green, 10);
