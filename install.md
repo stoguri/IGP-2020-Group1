@@ -1,6 +1,7 @@
 # Dependencies
 
 * Node.js, version 6.9.0 or newer.
+* MongoDB, version 4.4.2 or newer
 
 # Setting up authentication
 To set up user authentication go to <https://manage.auth0.com/>.
@@ -40,6 +41,14 @@ Create the config.json file in the server directory.
         "clientID": "from auth0",
         "clientSecret": "from auth0",
         "domain": "from auth0"
+    },
+    "db": {
+        "domain": "user defined",
+        "port": "user defined",
+        "name": "user defined"
+    },
+    "junction": {
+        "entrances": "{integer} - number of entrances"
     },
     "testMode": "set to true to run in test mode"
 }
