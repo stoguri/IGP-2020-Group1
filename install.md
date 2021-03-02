@@ -54,6 +54,11 @@ Create the config.json file in the server directory.
 }
 ```
 
+Initiliase the database by using the command:
+```
+npm run db_init
+```
+
 Run the application on the specified domain using the command: 
 ```bash
 npm start
