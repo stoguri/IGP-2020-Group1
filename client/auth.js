@@ -20,6 +20,6 @@ async function logout() {
  * @returns {boolean} true if authenticated
  */
 async function checkAuth() {
-    const response = await fetch('/auth/authCheck');
+    const response = await fetch('/auth/check');
     return response.ok;
 }

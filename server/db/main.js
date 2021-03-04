@@ -22,21 +22,49 @@ client.connect(err => {
 });
 
 /**
- * increments the count field in a record
- * @param {integer} entrance id of entrance to be incremented
- * @returns {integer} status code reporting success of function execution
+ * Adds a new vehicle record
+ * @param {identifer} identifier of new vehicle
+ * @param {integer} entrance_id 
+ * @param {time} entrance_time 
+ * @returns {integer} status code
  */
-module.exports.incrementEntrance = async function(entrance) {
+module.exports.newVehicle = async function(identifier, entrance_id, entrance_time) {
     try {
-        const collection = await db.collection('entrances');
+        await db.collection('vehicles').insertOne({
+            "identifier": identifier,
+            "entrance_id": entrance_id,
+            "entrance_time": entrance_time,
+            "exit_id": null,
+            "exit_time": null
+        });        
 
-        const filter = {$where: `this.id == ${entrance}`};
+        return 202;
+    } catch(e) {
+        console.error(e);
+        return 500;
+    }
+}
+
+/**
+ * Updates existing vehicle record
+ * @param {identifer} identifer of existing vehicle
+ * @param {integer} exit_id 
+ * @param {time} exit_time 
+ * @returns {integer} status code
+ */
+module.exports.updateVehicle = async function(identifier, exit_id, exit_time) {
+    try {
+        const collection = await db.collection("vehicles");
+
+        const filter = {$where: `this.identifier == ${identifier}`}
         const update = {
-            $inc: {'count': 1}
+            $set: {
+                "exit_id": exit_id,
+                "exit_time": exit_time
+            }
         };
 
         await collection.updateOne(filter, update);
-
         return 202;
     } catch(e) {
         console.error(e);

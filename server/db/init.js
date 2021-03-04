@@ -17,16 +17,9 @@ client.connect(err => {
         console.log("Connected to MongoDB server");
         const db = client.db(config.db.name);
 
-
         // if database exists then drop it
         db.dropDatabase();
-        
-        // add records for recording vehicles entering from each entrance
-        // ids should be alligned with jetson nano 
-        for(let i = 0; i < config.junction.entrances; i++) {
-            db.collection('entrances').insertOne({'id': i, 'count': 0});
-        }
-
+    
         console.log("Database initialised, exit using ctrl+c");
     }
 });

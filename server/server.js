@@ -61,7 +61,7 @@ app.get('/auth/logout', (req, res) => {
  * check if the user has an authenticated session
  * @response {status}
  */
-app.get('/auth/authCheck', (req, res) => {
+app.get('/auth/check', (req, res) => {
     if(req.session.auth) {
         res.sendStatus(204);
     } else {
@@ -69,18 +69,44 @@ app.get('/auth/authCheck', (req, res) => {
     }
 });
 
-// %%% data routes and functions %%%
+// %%% API routes and functions %%%
 
 // DB functions
 const db = require('./db/main.js');
 
-/** 
- * increments count field in the record related to given entrance id
- * for when a new vehicle comes through one of the entrances
- * @param {integer} req.query.entrance id of entrance to be incremented
+/**
+ * @api {post} /api/vehicle record new vehicle
+ * @apiName GetUser
+ * @apiGroup User
+ *
+ * @apiParam {identifier} identifier of new vehicle
+ * @apiParam {integer} id of entrance
+ * @apiParam {time} time of entrance
+ *
+ * @apiSuccess {status} 202
+ * @apiFailure {status} 500
  */
-app.put('/api/entrance/increment', async (req, res) => {
-    const status = await db.incrementEntrance(req.query.entrance);
+app.post('/api/vehicle', async (req, res) => {
+    const status = await db.newVehicle(req.query.identifier, 
+        req.query.id, req.query.time);
+    res.sendStatus(status);
+});
+
+/**
+ * @api {post} /api/vehicle record new vehicle
+ * @apiName GetUser
+ * @apiGroup User
+ *
+ * @apiParam {identifier} identifier of existing vehicle
+ * @apiParam {integer} id of exit
+ * @apiParam {time} time of exit
+ *
+ * @apiSuccess {status} 202
+ * @apiFailure {status} 500
+ */
+app.put('/api/vehicle/exit', async (req, res) => {
+    const status = await db.updateVehicle(req.query.identifier,
+        req.query.id, req.query.time);
     res.sendStatus(status);
 });
 
