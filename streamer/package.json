@@ -1,0 +1,16 @@
+{
+  "name": "videostreamer",
+  "version": "1.0.0",
+  "description": "Video streamer",
+  "main": "index.js",
+  "scripts": {
+    "test": "test",
+    "start": "node server.js"
+  },
+  "author": "ipg-2020-group1",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1",
+    "express-session": "^1.17.1"
+  }
+}
