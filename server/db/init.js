@@ -5,11 +5,10 @@ const MongoClient = require('mongodb').MongoClient;
 const config = require('../config');
 
 // connect to database
-const client = new MongoClient(`mongodb://${config.db.domain}:${config.db.port}`,
-    {useUnifiedTopology: true});
+const client = new MongoClient(`mongodb://${config.db.domain}:${config.db.port}`, { useUnifiedTopology: true });
 
 client.connect(err => {
-    if(err) {
+    if (err) {
         console.log(err);
     } else {
         console.log("Setting up database...");
@@ -19,7 +18,7 @@ client.connect(err => {
 
         // if database exists then drop it
         db.dropDatabase();
-    
+
         console.log("Database initialised, exit using ctrl+c");
     }
 });

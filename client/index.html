@@ -1,16 +1,36 @@
+<!DOCTYPE html>
+<html lang='en'>
+
 <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+
     <script src="index.js"></script>
     <script src="auth.js"></script>
     <script src="pages/main.js"></script>
     <script src="pages/splash.js"></script>
+
     <link rel="stylesheet" type="text/css" href="css/index.css">
+
     <title>Traffic Surviellance Application</title>
 </head>
 
 <body>
     <header></header>
 
-    <main>
-        <p>Main content...</p>
+    <div id="mySidebar" class="sidebar">
+        <button href="javascript:void(0)" class="closebtn" onclick="closeNav()">×</button>
+        <a href="#" class="sidebar-link">Home</a>
+        <a href="#" class="sidebar-link">Video Streams</a>
+        <a href="#" class="sidebar-link">Data records</a>
+        <a href="#" class="sidebar-link">About</a>
+    </div>
+
+    <main id="main">
     </main>
 </body>
+
+</html>

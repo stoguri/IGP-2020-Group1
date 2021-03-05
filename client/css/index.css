@@ -1,4 +1,103 @@
-* {
+body {
     padding: 0;
     margin: 0;
+    overflow-x: hidden;
+    font-family: 'Roboto', sans-serif;
 }
+
+
+/** Header content */
+
+header {
+    display: flex;
+    justify-content: center;
+    width: 100vw;
+    background-color: cadetblue;
+    color: black;
+}
+
+.title-wrapper {
+    display: inline-block;
+    margin: 0 auto;
+}
+
+.title-text {
+    font-size: 2.5vw;
+    font-weight: 200;
+}
+
+.header-button {
+    display: inline-block;
+    margin: 3vh 2vw 2vh 2vw;
+    padding: 5px;
+    height: 30px;
+    border: none;
+    border-radius: 3px;
+}
+
+
+/***************/
+
+
+/** Sidebar */
+
+.sidebar {
+    background-color: darkslategray;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 0;
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    overflow-x: hidden;
+    transition: 0.5s;
+    padding-top: 60px;
+}
+
+.sidebar a {
+    color: aliceblue;
+    padding: 8px 8px 8px 32px;
+    margin: 5vh 0;
+    text-decoration: none;
+    font-size: 3vh;
+    transition: 0.3s;
+}
+
+.sidebar a:hover {
+    color: black;
+    background-color: gray;
+    transition: linear 0.5s;
+}
+
+.sidebar .closebtn {
+    position: absolute;
+    top: 0;
+    right: 25px;
+    font-size: 4vw;
+    margin-left: 50px;
+}
+
+.closebtn {
+    background-color: darkslategray;
+    color: aliceblue;
+    border: none;
+}
+
+#main {
+    transition: margin-left .5s;
+    padding: 16px;
+}
+
+@media screen and (max-height: 450px) {
+    .sidebar {
+        padding-top: 15px;
+    }
+    .sidebar a {
+        font-size: 18px;
+    }
+}
+
+
+/***************/

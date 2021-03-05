@@ -8,8 +8,9 @@ async function login() {
 
 async function logout() {
     const response = await fetch('auth/logout');
-    if(response.ok) {
+    if (response.ok) {
         console.log("Logged out.");
+        window.location.reload();
     } else {
         console.error("Failed to log out.");
     }
