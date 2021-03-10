@@ -6,14 +6,6 @@ function generatePage_main() {
 
     //--- header content ---//
 
-    // Menu button
-    const menu_button = document.createElement('button');
-    header.appendChild(menu_button);
-    menu_button.classList.add('menu-button');
-    menu_button.classList.add('header-button');
-    menu_button.textContent = '☰ Menu';
-    menu_button.onclick = openNav;
-
     // title text
     const title_wrapper = document.createElement('div');
     const title_text = document.createElement('h1');
