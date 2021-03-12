@@ -1,60 +1,56 @@
 import React from 'react';
-import { makeStyles } from '@material-ui/core/styles';
-import Paper from '@material-ui/core/Paper';
-import Grid from '@material-ui/core/Grid';
 import Container from '@material-ui/core/Container'
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
+import { DataGrid } from '@material-ui/data-grid';
 import './Main.css';
 
-const useStyles = makeStyles((theme) => ({
-  container: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(12, 1fr)',
-    gridGap: theme.spacing(3),
-  },
-  paper: {
-    padding: theme.spacing(1),
-    textAlign: 'center',
-    color: theme.palette.text.secondary,
-    whiteSpace: 'nowrap',
-    marginBottom: theme.spacing(1),
-  },
-  divider: {
-    margin: theme.spacing(2, 0),
-  },
-}));
-
-
 function Main() {
-  const classes = useStyles();
+
+  const columns = [
+    { field: 'id', headerName: 'ID', width: 70 },
+    { field: 'dirIn', headerName: 'Direction In', width: 130 },
+    { field: 'dirOut', headerName: 'Direction Out', width: 130 },
+  ];
+
+  const rows = [
+    {id: '1', dirIn: 'Camera 2', dirOut: 'camera 4'},
+    {id: '2', dirIn: 'Camera 2', dirOut: 'camera 4'},
+    {id: '3', dirIn: 'Camera 2', dirOut: 'camera 4'},
+    {id: '4', dirIn: 'Camera 2', dirOut: 'camera 4'},
+    {id: '5', dirIn: 'Camera 2', dirOut: 'camera 4'},
+    {id: '6', dirIn: 'Camera 2', dirOut: 'camera 4'},
+    {id: '7', dirIn: 'Camera 2', dirOut: 'camera 4'},
+    {id: '8', dirIn: 'Camera 2', dirOut: 'camera 4'},
+  ];
 
   return (
     <main className="App-header">
-      <Container max-width='sm'>
-        <Container max-width='sm'>
-          Main Video
+      <Container id='main-grid'>
+        <Container id='upper-grid'>
+          <Container id='large-video-wrapper'>
+            Large Video
+          </Container>
+          <Container id='main-data-table'>
+            <DataGrid id='datagrid' rows={rows} columns={columns} pageSize={10} />
+          </Container>
         </Container>
-        <Grid container spacing={3}>
-          <Grid item xs={3}>
-            <Paper className={classes.paper}>xs=3</Paper>
-          </Grid>
-          <Grid item xs={3}>
-            <Paper className={classes.paper}>xs=3</Paper>
-          </Grid>
-          <Grid item xs={3}>
-            <Paper className={classes.paper}>xs=3</Paper>
-          </Grid>
-          <Grid item xs={3}>
-            <Paper className={classes.paper}>xs=3</Paper>
-          </Grid>
-          <Grid item xs={8}>
-            <Paper className={classes.paper}>xs=8</Paper>
-          </Grid>
-          <Grid item xs={4}>
-            <Paper className={classes.paper}>xs=4</Paper>
-          </Grid>
-        </Grid>
+        <Container id='lower-grid'>
+          <List id='video-sub-list'>
+            <ListItem className='video-list-item'>
+              Video 2
+            </ListItem>
+            <ListItem className='video-list-item'>
+              Video 3
+            </ListItem>
+            <ListItem className='video-list-item'>
+              Video 4
+            </ListItem>
+            <ListItem className='video-list-item'>
+              Video 5
+            </ListItem>
+          </List>
+        </Container>
       </Container>
     </main>
   );

@@ -1,6 +1,5 @@
 export const login = async () => {
     const response = await fetch('http://localhost:8080/auth/login/auth0');
-    console.log(response.text);
     if (response.ok) {
         return true;
     } else {
