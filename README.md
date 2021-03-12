@@ -1,4 +1,12 @@
 # IGP-2020-Group1 React Frontend
+
+## starting application
+    1. Install Node.js 
+    2. cd into `./backend` and `./client` and run `npm install --save` to install dependancies for both applications.
+    3. cd back into `./backend` and use the `nodemon` commandd to start the server.
+    4. cd into `./client` and use the `npm start` command to start the React App.
+    5. React will automatically open up a browser page for you; Alternatively navigate to [http://localhost:8080](http://localhost:8080) 
+
 ## Available Scripts
 
 In the project directory, you can run:
@@ -6,10 +14,7 @@ In the project directory, you can run:
 ### `npm start`
 
 Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
-
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+Open  to view it in the browser.
 
 ### `npm test`
 
