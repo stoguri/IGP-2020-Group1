@@ -121,7 +121,7 @@ app.put('/api/vehicle/exit', async (req, res) => {
  * @apiParam {integer} exit_id
  * @apiParam {time} exit_time
  *
- * @apiSuccess {status} 200
+ * @apiSuccess {json} found records
  * @apiFailure {status} 500
  */
 app.get('/api/vehicle', async (req, res) => {
