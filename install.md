@@ -31,7 +31,7 @@ npm install
 
 Create the config.json file in the server directory.
 
-## Config.json structure
+## config.json structure
 ```json
 {
     "network": {
@@ -53,6 +53,18 @@ Create the config.json file in the server directory.
     },
     "auditMode": "{boolean} set to true to run in audit mode"
 }
+```
+
+Create the headlessUsers.json file in the server directory. Add any users that require headless login to this json. The password string should be unencrypted in this file, when login requests are made the passwords should be encrypted using MD5 encryption.
+
+## headlessUsers.json structure
+```json
+[
+    {
+        "username": "{string} user defined",
+        "password": "{string} user defined"
+    }
+]
 ```
 
 Initiliase the database by using the command:

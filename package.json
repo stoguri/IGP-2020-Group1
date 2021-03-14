@@ -25,6 +25,7 @@
     "apidoc": "^0.26.0",
     "auth0": "^2.33.0",
     "chai": "^4.3.0",
+    "crypto": "^1.0.1",
     "express": "^4.17.1",
     "express-session": "^1.17.1",
     "mocha": "^8.3.0",

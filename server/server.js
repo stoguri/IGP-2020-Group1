@@ -24,7 +24,7 @@ app.use(session({
 
 // %%% passport middleware %%%
 
-require('./auth.js');
+const auth = require('./auth.js');
 
 app.use(passport.initialize());
 
@@ -58,14 +58,46 @@ app.get('/auth/logout', (req, res) => {
 // %%% authentication routes & functions %%%
 
 /**
- * check if the user has an authenticated session
- * @response {status}
+ * @api {get} /auth/login/headless login for headless applications 
+ * @apiName GetUser
+ * @apiGroup User
+ *
+ * @apiParam {string} username
+ * @apiParam {string} encrypted password
+ *
+ * @apiSuccess {status} 204
+ * @apiFailure {status} 401, 404
+ */
+app.get('/auth/login/headless', (req, res) => {
+    const status = auth.headlessLogin(req.query.username, req.query.password);
+
+    if(status == 204) {
+        req.session.user = {
+            "displayName": req.query.username
+        };
+        req.session.auth = true;
+
+        console.log(req.session.user.displayName + " authenticated.");
+
+        res.redirect('/');
+    } else {
+        res.sendStatus(status);
+    }    
+});
+
+/**
+ * @api {get} /auth/check check if the user has an authenticated session
+ * @apiName GetUser
+ * @apiGroup User
+ *
+ * @apiSuccess {status} 204
+ * @apiFailure {status} 401
  */
 app.get('/auth/check', (req, res) => {
     if(req.session.auth) {
         res.sendStatus(204);
     } else {
-        res.sendStatus(403);
+        res.sendStatus(401);
     }
 });
 
