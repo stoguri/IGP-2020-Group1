@@ -7,6 +7,7 @@
     "test": "mocha --reporter spec",
     "start": "node server/server.js",
     "db_init": "node server/db/init.js",
+    "db_populate": "node server/db/populate.js",
     "wavi_generate": "wavi ./ ./bin/graph.svg",
     "apidoc_generate": "node ./apidocTest.js"
   },

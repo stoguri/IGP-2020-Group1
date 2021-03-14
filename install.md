@@ -6,11 +6,12 @@
 # Setting up authentication
 To set up user authentication go to <https://manage.auth0.com/>.
 
-1. Create a single page web application.
+1. Create a single page JavaScript web application.
 2. Go to application settings.
-3. Put 'http://%YOURDOMAIN%:%YOURPORT%/auth/callback' in the "Allowed Callbacks URLs" box.
-4. Put 'http://%YOURDOMAIN%:%YOURPORT%/auth/logout' in the "Allowed Logout URLs" box.
-5. Save changes.
+3. Put "%YOURDOMAIN%:%YOURPORT%/auth/callback" in the "Allowed Callbacks URLs" box.
+4. Put "%YOURDOMAIN%:%YOURPORT%" in the "Allowed Logout URLs" box.
+5. Put "%YOURDOMAIN&:%YOURPORT%" in the "Allowed Web Origins" box.
+6. Save changes.
 
 # Running the application
 
@@ -34,29 +35,34 @@ Create the config.json file in the server directory.
 ```json
 {
     "network": {
-        "domain": "user defined",
-        "port": "user defined"
+        "domain": "{string} user defined",
+        "port": "{integer} user defined"
     },
     "auth": {
-        "clientID": "from auth0",
-        "clientSecret": "from auth0",
-        "domain": "from auth0"
+        "clientID": "{string} from auth0",
+        "clientSecret": "{string} from auth0",
+        "domain": "{string} from auth0"
     },
     "db": {
-        "domain": "user defined",
-        "port": "user defined",
-        "name": "user defined"
+        "domain": "{string} user defined",
+        "port": "{integer} user defined",
+        "name": "{string} user defined"
     },
     "junction": {
-        "entrances": "{integer} - number of entrances"
+        "entrances": "{integer} number of entrances"
     },
-    "testMode": "set to true to run in test mode"
+    "auditMode": "{boolean} set to true to run in audit mode"
 }
 ```
 
 Initiliase the database by using the command:
-```
+```bash
 npm run db_init
+```
+
+The database can be populated by test data by using the command:
+```bash
+npm run db_populate
 ```
 
 Run the application on the specified domain using the command: 

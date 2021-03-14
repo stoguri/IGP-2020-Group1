@@ -38,7 +38,7 @@ module.exports.newVehicle = async function(identifier, entrance_id, entrance_tim
             "exit_time": null
         });        
 
-        return 202;
+        return 201;
     } catch(e) {
         console.error(e);
         return 500;
@@ -66,6 +66,38 @@ module.exports.updateVehicle = async function(identifier, exit_id, exit_time) {
 
         await collection.updateOne(filter, update);
         return 202;
+    } catch(e) {
+        console.error(e);
+        return 500;
+    }
+}
+
+/**
+ * Get vehicle record - using filter fields
+ * @param {identifer} identifer of existing vehicle
+ * @param {integer} entrance_id 
+ * @param {time} entrance_time 
+ * @param {integer} exit_id 
+ * @param {time} exit_time 
+ * @returns {json} found records
+ */
+module.exports.getVehicles = async function(fields) {
+    try {
+        const collection = await db.collection("vehicles");
+
+        let filterString = "";
+        const keys = Object.keys(fields);
+        for(let key of keys) {
+            if(fields[key] != undefined) {
+                if(filterString != "") {
+                    filterString += ", ";
+                }
+                filterString += `${key}: ${fields[key]}`;
+            }
+        }
+        filterString += "";
+
+        return await collection.find(`{${filterString}}`).toArray();
     } catch(e) {
         console.error(e);
         return 500;

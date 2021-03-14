@@ -88,7 +88,7 @@ const db = require('./db/main.js');
  */
 app.post('/api/vehicle', async (req, res) => {
     const status = await db.newVehicle(req.query.identifier, 
-        req.query.id, req.query.time);
+        parseInt(req.query.id), req.query.time);
     res.sendStatus(status);
 });
 
@@ -106,11 +106,43 @@ app.post('/api/vehicle', async (req, res) => {
  */
 app.put('/api/vehicle/exit', async (req, res) => {
     const status = await db.updateVehicle(req.query.identifier,
-        req.query.id, req.query.time);
+        parseInt(req.query.id), req.query.time);
     res.sendStatus(status);
 });
 
+/**
+ * @api {get} /api/vehicle get vehicle record - using filter fields
+ * @apiName GetUser
+ * @apiGroup User
+ *
+ * @apiParam {identifier} identifier of vehicle
+ * @apiParam {integer} entrance_id
+ * @apiParam {time} entrance_time
+ * @apiParam {integer} exit_id
+ * @apiParam {time} exit_time
+ *
+ * @apiSuccess {status} 200
+ * @apiFailure {status} 500
+ */
+app.get('/api/vehicle', async (req, res) => {
+    try {
+        const fields = {
+            "identifier": req.query.identifier,
+            "entrance_id": parseInt(req.query.entrance_id),
+            "entrance_time": req.query.entrance_time,
+            "exit_id": parseInt(req.query.exit_id),
+            "exit_time": req.query.exit_time
+        }
+
+        res.json(await db.getVehicles(fields));
+    } catch(e) {   
+        console.error(e);
+        res.sendStatus(500);
+    }
+});
+
 // %%% demo and debug functions %%%
+
 app.get('/debug/test', (req, res) => {
     res.json({"field1": "value1", "field2": "value2"});
 });
