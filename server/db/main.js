@@ -31,11 +31,11 @@ client.connect(err => {
 module.exports.newVehicle = async function(identifier, entrance_id, entrance_time) {
     try {
         await db.collection('vehicles').insertOne({
-            "identifier": identifier,
-            "entrance_id": entrance_id,
-            "entrance_time": entrance_time,
-            "exit_id": null,
-            "exit_time": null
+            identifier: identifier,
+            entrance_id: entrance_id,
+            entrance_time: entrance_time,
+            exit_id: null,
+            exit_time: null
         });        
 
         return 201;
@@ -59,8 +59,8 @@ module.exports.updateVehicle = async function(identifier, exit_id, exit_time) {
         const filter = {$where: `this.identifier == ${identifier}`}
         const update = {
             $set: {
-                "exit_id": exit_id,
-                "exit_time": exit_time
+                exit_id: exit_id,
+                exit_time: exit_time
             }
         };
 

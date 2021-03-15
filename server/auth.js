@@ -6,8 +6,6 @@ const crypto = require('crypto');
 
 const config = require('./config');
 const headlessUsers = require('./headlessUsers.json');
-const { constants } = require('buffer');
-const { log } = require('console');
 
 passport.serializeUser(function(user, done) {
         done(null, user);

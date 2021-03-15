@@ -112,7 +112,7 @@ const db = require('./db/main.js');
  * @apiGroup User
  *
  * @apiParam {identifier} identifier of new vehicle
- * @apiParam {integer} id of entrance
+ * @apiParam {string} id of entrance
  * @apiParam {time} time of entrance
  *
  * @apiSuccess {status} 202
@@ -120,7 +120,7 @@ const db = require('./db/main.js');
  */
 app.post('/api/vehicle', async (req, res) => {
     const status = await db.newVehicle(req.query.identifier, 
-        parseInt(req.query.id), req.query.time);
+        req.query.id, req.query.time);
     res.sendStatus(status);
 });
 
@@ -130,7 +130,7 @@ app.post('/api/vehicle', async (req, res) => {
  * @apiGroup User
  *
  * @apiParam {identifier} identifier of existing vehicle
- * @apiParam {integer} id of exit
+ * @apiParam {string} id of exit
  * @apiParam {time} time of exit
  *
  * @apiSuccess {status} 202
@@ -138,7 +138,7 @@ app.post('/api/vehicle', async (req, res) => {
  */
 app.put('/api/vehicle/exit', async (req, res) => {
     const status = await db.updateVehicle(req.query.identifier,
-        parseInt(req.query.id), req.query.time);
+        req.query.id, req.query.time);
     res.sendStatus(status);
 });
 
@@ -148,9 +148,9 @@ app.put('/api/vehicle/exit', async (req, res) => {
  * @apiGroup User
  *
  * @apiParam {identifier} identifier of vehicle
- * @apiParam {integer} entrance_id
+ * @apiParam {string} entrance_id
  * @apiParam {time} entrance_time
- * @apiParam {integer} exit_id
+ * @apiParam {string} exit_id
  * @apiParam {time} exit_time
  *
  * @apiSuccess {json} found records
@@ -160,13 +160,39 @@ app.get('/api/vehicle', async (req, res) => {
     try {
         const fields = {
             "identifier": req.query.identifier,
-            "entrance_id": parseInt(req.query.entrance_id),
+            "entrance_id": req.query.entrance_id,
             "entrance_time": req.query.entrance_time,
-            "exit_id": parseInt(req.query.exit_id),
+            "exit_id": req.query.exit_id,
             "exit_time": req.query.exit_time
         }
 
-        res.json(await db.getVehicles(fields));
+        const records = await db.getVehicles(fields);
+        const details = {entrance: {}, exit: {}, route: {}};
+
+        // construct details array
+        // load entrances from config
+        for(const entrance of config.entrances) {
+            details.entrance[entrance] = 0;
+            details.exit[entrance] = 0;
+            // routes
+            for(const e of config.entrances) {
+                if(entrance == e) {
+                    continue;
+                }
+                details.route[`${entrance}-${e}`] = 0;
+            }
+        }
+
+        // derived fields
+        for(const record of records) {
+            details.entrance[record.entrance_id]++;
+            if(record.exit_id != null) {
+                details.exit[record.exit_id]++;
+                details.route[`${record.entrance_id}-${record.exit_id}`]++;
+            }
+        }
+
+        res.json(details);
     } catch(e) {   
         console.error(e);
         res.sendStatus(500);

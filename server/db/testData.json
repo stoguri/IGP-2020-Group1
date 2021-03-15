@@ -1,9 +1,9 @@
 [
     {
         "identifier": "0",
-        "entrance_id": 0, 
+        "entrance_id": "id0", 
         "entrance_time": "16:00",
-        "exit_id": 1,
+        "exit_id": "id1",
         "exit_time": "16:15"
     }
 ]
