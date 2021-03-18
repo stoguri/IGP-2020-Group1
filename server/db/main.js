@@ -73,31 +73,43 @@ module.exports.updateVehicle = async function(identifier, exit_id, exit_time) {
 }
 
 /**
- * Get vehicle record - using filter fields
- * @param {identifer} identifer of existing vehicle
- * @param {integer} entrance_id 
- * @param {time} entrance_time 
- * @param {integer} exit_id 
- * @param {time} exit_time 
- * @returns {json} found records
+ * Get vehicle records
+ * @param {string} entrance_id
+ * @param {integer} entrance_time epoch time
+ * @param {string} exit_id
+ * @param {integer} exit_time epoch time
+ * @param {boolean} inclusive if the times give are inclusive or exclusive
+ * @returns {array} found records
  */
-module.exports.getVehicles = async function(fields) {
+module.exports.getVehicles = async function(entrance_id, entrance_time, exit_id, exit_time, inclusive){
     try {
         const collection = await db.collection("vehicles");
 
-        let filterString = "";
-        const keys = Object.keys(fields);
-        for(let key of keys) {
-            if(fields[key] != undefined) {
-                if(filterString != "") {
-                    filterString += ", ";
-                }
-                filterString += `${key}: ${fields[key]}`;
+        // construct query
+        const query = {};
+        if(entrance_id) {
+            query.entrance_id = entrance_id;
+        }
+        if(exit_id) {
+            query.exit_id = exit_id;
+        }
+        if(entrance_time) {
+            if(inclusive == 'true') {
+                query.entrance_time = {$gte: entrance_time};
+            } else {
+                query.entrance_time = {$lte: entrance_time};
             }
         }
-        filterString += "";
+        if(exit_time) {
+            if(inclusive == 'true') {
+                query.exit_time = {$lte: exit_time};
+            } else {
+                query.exit_time = {$gte: exit_time};
+            }
+        }
 
-        return await collection.find(`{${filterString}}`).toArray();
+        // make query
+        return await collection.find(query).toArray();
     } catch(e) {
         console.error(e);
         return 500;

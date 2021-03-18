@@ -2,8 +2,8 @@
     {
         "identifier": "0",
         "entrance_id": "id0", 
-        "entrance_time": "16:00",
+        "entrance_time": 1615995425709,
         "exit_id": "id1",
-        "exit_time": "16:15"
+        "exit_time": 1615995426188
     }
 ]

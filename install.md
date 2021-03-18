@@ -1,7 +1,7 @@
 # Dependencies
 
-* Node.js, version 6.9.0 or newer.
-* MongoDB, version 4.4.2 or newer
+* [Node.js](https://nodejs.org/en/download/ "Node.js download"), version 6.9.0 or newer.
+* [MongoDB Shell](https://www.mongodb.com/try/download/shell, "MongoDB Shell download"), version 4.4.2 or newer - this should be running as a service when deploying this application.
 
 # Setting up authentication
 To set up user authentication go to <https://manage.auth0.com/>.

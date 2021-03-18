@@ -10,6 +10,9 @@ const app = express();
 
 const config = require('./config');
 
+// verify some config information is correct
+// log output for user
+
 const server = app.listen(config.network.port, () => {
     console.log('Server listening on:', config.network.domain + ':' + config.network.port);
 });
@@ -113,14 +116,14 @@ const db = require('./db/main.js');
  *
  * @apiParam {identifier} identifier of new vehicle
  * @apiParam {string} id of entrance
- * @apiParam {time} time of entrance
+ * @apiParam {integer} epoch time - entrance_time
  *
  * @apiSuccess {status} 202
  * @apiFailure {status} 500
  */
 app.post('/api/vehicle', async (req, res) => {
     const status = await db.newVehicle(req.query.identifier, 
-        req.query.id, req.query.time);
+        req.query.id, parseFloat(req.query.time));
     res.sendStatus(status);
 });
 
@@ -131,14 +134,14 @@ app.post('/api/vehicle', async (req, res) => {
  *
  * @apiParam {identifier} identifier of existing vehicle
  * @apiParam {string} id of exit
- * @apiParam {time} time of exit
+ * @apiParam {integer} epoch time - exit_time
  *
  * @apiSuccess {status} 202
  * @apiFailure {status} 500
  */
 app.put('/api/vehicle/exit', async (req, res) => {
     const status = await db.updateVehicle(req.query.identifier,
-        req.query.id, req.query.time);
+        req.query.id, parseFloat(req.query.time));
     res.sendStatus(status);
 });
 
@@ -146,29 +149,22 @@ app.put('/api/vehicle/exit', async (req, res) => {
  * @api {get} /api/vehicle get vehicle record - using filter fields
  * @apiName GetUser
  * @apiGroup User
- *
- * @apiParam {identifier} identifier of vehicle
+ * 
  * @apiParam {string} entrance_id
- * @apiParam {time} entrance_time
+ * @apiParam {integer} entrance_time epoch time
  * @apiParam {string} exit_id
- * @apiParam {time} exit_time
+ * @apiParam {integer} exit_time epoch time
+ * @apiParam {boolean} inclusive if the times give are inclusive or exclusive
  *
- * @apiSuccess {json} found records
+ * @apiSuccess {json} details showing entrance, exit and route data
  * @apiFailure {status} 500
  */
 app.get('/api/vehicle', async (req, res) => {
     try {
-        const fields = {
-            "identifier": req.query.identifier,
-            "entrance_id": req.query.entrance_id,
-            "entrance_time": req.query.entrance_time,
-            "exit_id": req.query.exit_id,
-            "exit_time": req.query.exit_time
-        }
+        const records = await db.getVehicles(req.query.entrance_id, parseFloat(req.query.entrance_time),
+            req.query.exit_id, parseFloat(req.query.exit_time), req.query.inclusive);
 
-        const records = await db.getVehicles(fields);
         const details = {entrance: {}, exit: {}, route: {}};
-
         // construct details array
         // load entrances from config
         for(const entrance of config.entrances) {
