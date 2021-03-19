@@ -32,7 +32,7 @@ passport.use(new Auth0Strategy(
 /**
  * Checks if authentication details given match an entry in headlessUsers.json
  * @param {string} username 
- * @param {string} password encrypted 
+ * @param {string} password encrypted using encryption method specified in config.json
  * @returns {status}
  */
 module.exports.headlessLogin = function(username, password) {
@@ -53,7 +53,7 @@ module.exports.headlessLogin = function(username, password) {
     }
 
     // check if password matches
-    const hash = crypto.createHash('md5');
+    const hash = crypto.createHash(config.auth.encryptionMethod);
     hash.update(user.password);
 
     if(hash.digest('hex') == password) {

@@ -41,7 +41,8 @@ Create the config.json file in the server directory.
     "auth": {
         "clientID": "{string} from auth0",
         "clientSecret": "{string} from auth0",
-        "domain": "{string} from auth0"
+        "domain": "{string} from auth0",
+        "encryptionMethod": "{string} user defined, must be supported by the version of OpenSSL on the platform. Eg. 'sha1', 'md5'." 
     },
     "db": {
         "domain": "{string} user defined",
