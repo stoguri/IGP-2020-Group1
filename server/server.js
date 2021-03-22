@@ -8,13 +8,14 @@ const passport = require('passport');
 
 const app = express();
 
-const config = require('./config');
+const config = require('./config.json');
 
 // verify some config information is correct
 // log output for user
 
 const server = app.listen(config.network.port, () => {
-    console.log('Server listening on:', config.network.domain + ':' + config.network.port);
+    console.log(`Server running is ${config.operationMode} mode, listening on:` +
+        config.network.domain + ':' + config.network.port);
 });
 
 app.use('/', express.static('client', {'extensions': ['html']}));
@@ -51,17 +52,6 @@ app.get('/auth/callback', passport.authenticate('auth0'), (req, res) => {
     res.redirect('/');
 });
 
-app.get('/auth/logout', (req, res) => {
-    req.session.destroy(function (err) {
-        res.redirect('/');
-        res.end();
-    });
-});
-
-async function getPermissionLevel(req) {
-    return await db.getPermissionLevel(req.session.user.id.split("|")[1]);
-}
-
 // %%% authentication routes & functions %%%
 
 /**
@@ -72,13 +62,13 @@ async function getPermissionLevel(req) {
  * @apiParam {string} username
  * @apiParam {string} encrypted password
  *
- * @apiSuccess {status} 204
+ * @apiSuccess {status} 200
  * @apiFailure {status} 401, 404
  */
 app.get('/auth/login/headless', (req, res) => {
     const status = auth.headlessLogin(req.query.username, req.query.password);
 
-    if(status == 204) {
+    if(status.toString()[0] == 2) {
         req.session.user = {
             "displayName": req.query.username,
             "id": `headless|${req.query.username}`
@@ -91,6 +81,13 @@ app.get('/auth/login/headless', (req, res) => {
     } else {
         res.sendStatus(status);
     }    
+});
+
+app.get('/auth/logout', (req, res) => {
+    req.session.destroy(function (err) {
+        res.redirect('/');
+        res.end();
+    });
 });
 
 /**
@@ -108,6 +105,10 @@ app.get('/auth/check', (req, res) => {
         res.sendStatus(401);
     }
 });
+
+async function getPermissionLevel(req) {
+    return await db.getPermissionLevel(req.session.user.id.split("|")[1]);
+}
 
 // %%% API routes and functions %%%
 
@@ -208,44 +209,3 @@ app.get('/api/vehicle', async (req, res) => {
         res.sendStatus(500);
     }
 });
-
-// %%% demo and debug functions %%%
-
-app.get('/debug/test', (req, res) => {
-    res.json({"field1": "value1", "field2": "value2"});
-});
-
-app.get("demo/rgbToHex", function(req, res) {
-    const red   = parseInt(req.query.red, 10);
-    const green = parseInt(req.query.green, 10);
-    const blue  = parseInt(req.query.blue, 10);
-    const hex = converter.rgbToHex(red, green, blue);
-    res.send(hex);
-});
-  
-app.get("demo/hexToRgb", function(req, res) {
-    const hex = req.query.hex;
-    const rgb = converter.hexToRgb(hex);
-    res.send(JSON.stringify(rgb));
-});
-
-// same as functions from clientside test
-function rgbToHex(red, green, blue) {
-    const redHex   = red.toString(16);
-    const greenHex = green.toString(16);
-    const blueHex  = blue.toString(16);
-  
-    return pad(redHex) + pad(greenHex) + pad(blueHex);
-  };
-  
-function pad(hex) {
-    return (hex.length === 1 ? "0" + hex : hex);
-}
-
-function hexToRgb(hex) {
-    const red   = parseInt(hex.substring(0, 2), 16);
-    const green = parseInt(hex.substring(2, 4), 16);
-    const blue  = parseInt(hex.substring(4, 6), 16);
-
-    return [red, green, blue];
-};

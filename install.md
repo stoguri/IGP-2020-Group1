@@ -50,7 +50,7 @@ Create the config.json file in the server directory.
         "name": "{string} user defined"
     },
     "junction": ["{[string]} list of entrance ids"],
-    "auditMode": "{boolean} set to true to run in audit mode"
+    "operationMode": "{string} deployment, audit or test"
 }
 ```
 

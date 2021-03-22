@@ -2,7 +2,7 @@
 'use strict';
 
 const MongoClient = require('mongodb').MongoClient;
-const config = require('../config');
+const config = require('../config.json');
 
 // TODO export this to external
 const client = new MongoClient(`mongodb://${config.db.domain}:${config.db.port}`,
@@ -14,8 +14,6 @@ client.connect(err => {
     if(err) {
         console.log(err);
     } else {
-        console.log("Setting up database...");
-
         console.log("Connected to MongoDB server");
         db = client.db(config.db.name);
     }
@@ -47,7 +45,7 @@ module.exports.newVehicle = async function(identifier, entrance_id, entrance_tim
             entrance_time: entrance_time,
             exit_id: null,
             exit_time: null
-        });        
+        });
 
         return 201;
     } catch(e) {

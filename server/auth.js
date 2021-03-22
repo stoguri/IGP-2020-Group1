@@ -4,8 +4,12 @@ const passport = require('passport');
 const Auth0Strategy = require('passport-auth0');
 const crypto = require('crypto');
 
-const config = require('./config');
+const config = require('./config.json');
 const headlessUsers = require('./headlessUsers.json');
+
+if(config.operationMode == "test") {
+    headlessUsers.concat(require('./testHeadlessUsers.json'))
+}
 
 passport.serializeUser(function(user, done) {
         done(null, user);
