@@ -49,7 +49,7 @@ Create the config.json file in the server directory.
         "port": "{integer} user defined",
         "name": "{string} user defined"
     },
-    "junction": ["{string} list of entrance ids"],
+    "junction": ["{[string]} list of entrance ids"],
     "auditMode": "{boolean} set to true to run in audit mode"
 }
 ```

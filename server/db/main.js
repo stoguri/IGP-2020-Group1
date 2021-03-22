@@ -21,6 +21,17 @@ client.connect(err => {
     }
 });
 
+module.exports.getPermissionLevel = async function(id) {
+    try {
+        const collection = await db.collection('users');
+        const record = await collection.findOne({id: id});
+        return record.permissionLevel;
+    } catch(e) {
+        console.error(e);
+        return null;
+    }
+}
+
 /**
  * Adds a new vehicle record
  * @param {identifer} identifier of new vehicle

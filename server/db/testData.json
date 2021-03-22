@@ -1,9 +1,25 @@
-[
-    {
-        "identifier": "0",
-        "entrance_id": "id0", 
-        "entrance_time": 1615995425709,
-        "exit_id": "id1",
-        "exit_time": 1615995426188
-    }
-]
+{
+    "vehicles": [
+        {
+            "identifier": "0",
+            "entrance_id": "id0", 
+            "entrance_time": 1615995425709,
+            "exit_id": "id1",
+            "exit_time": 1615995426188
+        }
+    ],
+    "users": [
+        {
+            "id": "inferenceNetwork",
+            "permissionLevel": "writer"
+        },
+        {
+            "id": "117305262011507965191",
+            "permissionLevel": "admin"
+        },
+        {
+            "id": "100589479111199846728",
+            "permissionLevel": "basic"
+        }
+    ]
+}

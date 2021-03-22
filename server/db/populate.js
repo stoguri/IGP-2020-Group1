@@ -3,7 +3,7 @@
 
 const MongoClient = require('mongodb').MongoClient;
 const config = require('../config');
-const records = require('./testData');
+const testData = require('./testData');
 
 // connect to database
 const client = new MongoClient(`mongodb://${config.db.domain}:${config.db.port}`,
@@ -16,8 +16,12 @@ client.connect(err => {
         console.log("Connected to MongoDB server");
         const db = client.db(config.db.name);
 
-        db.collection('vehicles').insertMany(records);
+        // vehicle records
+        db.collection('vehicles').insertMany(testData.vehicles);
     
+        // user records
+        db.collection('users').insertMany(testData.users);
+
         console.log("Database populated, exit using ctrl+c");
     }
 });

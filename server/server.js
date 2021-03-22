@@ -58,6 +58,10 @@ app.get('/auth/logout', (req, res) => {
     });
 });
 
+async function getPermissionLevel(req) {
+    return await db.getPermissionLevel(req.session.user.id.split("|")[1]);
+}
+
 // %%% authentication routes & functions %%%
 
 /**
@@ -76,7 +80,8 @@ app.get('/auth/login/headless', (req, res) => {
 
     if(status == 204) {
         req.session.user = {
-            "displayName": req.query.username
+            "displayName": req.query.username,
+            "id": `headless|${req.query.username}`
         };
         req.session.auth = true;
 
@@ -147,8 +152,8 @@ app.put('/api/vehicle/exit', async (req, res) => {
 
 /**
  * @api {get} /api/vehicle get vehicle record - using filter fields
- * @apiName GetUser
- * @apiGroup User
+ * @apiName GetVehicle
+ * @apiGroup basic, admin
  * 
  * @apiParam {string} entrance_id
  * @apiParam {integer} entrance_time epoch time
@@ -160,6 +165,15 @@ app.put('/api/vehicle/exit', async (req, res) => {
  * @apiFailure {status} 500
  */
 app.get('/api/vehicle', async (req, res) => {
+    if(!req.session.auth) {
+        res.sendStatus(401);
+        return;
+    }
+    if(!["basic", "admin"].includes(await getPermissionLevel(req))) {
+        res.sendStatus(403);
+        return;
+    }
+
     try {
         const records = await db.getVehicles(req.query.entrance_id, parseFloat(req.query.entrance_time),
             req.query.exit_id, parseFloat(req.query.exit_time), req.query.inclusive);
