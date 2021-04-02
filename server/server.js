@@ -4,14 +4,14 @@ const express = require('express');
 const session = require('express-session');
 const passport = require('passport');
 
-// %%% init server %%% 
-
-const app = express();
-
 const config = require('./config.json');
 
 // verify some config information is correct
 // log output for user
+
+// %%% init server %%% 
+
+const app = express();
 
 const server = app.listen(config.network.port, () => {
     console.log(`Server running is ${config.operationMode} mode, listening on:` +
@@ -27,11 +27,9 @@ app.use(session({
 }));
 
 // %%% passport middleware %%%
-
 const auth = require('./auth.js');
 
 app.use(passport.initialize());
-
 app.use(passport.session());
 
 /**
@@ -122,10 +120,12 @@ const db = require('./db/main.js');
  *
  * @apiParam {identifier} identifier of new vehicle
  * @apiParam {string} id of entrance
- * @apiParam {integer} epoch time - entrance_time
+ * @apiParam {integer} epoch time - entrance time
+ * @apiParam {string} id of exit
+ * @apiParam {integer} epoch time - exit time
  *
  * @apiSuccess {status} 202
- * @apiFailure {status} 500
+ * @apiFailure {status} 401, 403, 500
  */
 app.post('/api/vehicle', async (req, res) => {
     if(!req.session.auth) {
@@ -160,7 +160,7 @@ app.post('/api/vehicle', async (req, res) => {
  * @apiParam {boolean} inclusive if the times give are inclusive or exclusive
  *
  * @apiSuccess {json} details showing entrance, exit and route data
- * @apiFailure {status} 500
+ * @apiFailure {status} 401, 403, 500
  */
 app.get('/api/vehicle', async (req, res) => {
     if(!req.session.auth) {
