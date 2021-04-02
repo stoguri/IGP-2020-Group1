@@ -128,27 +128,24 @@ const db = require('./db/main.js');
  * @apiFailure {status} 500
  */
 app.post('/api/vehicle', async (req, res) => {
-    const status = await db.newVehicle(req.query.identifier, 
-        req.query.id, parseFloat(req.query.time));
-    res.sendStatus(status);
-});
+    if(!req.session.auth) {
+        res.sendStatus(401);
+        return;
+    }
+    if(!["writer"].includes(await getPermissionLevel(req))) {
+        res.sendStatus(403);
+        return;
+    }
 
-/**
- * @api {post} /api/vehicle record new vehicle
- * @apiName GetUser
- * @apiGroup User
- *
- * @apiParam {identifier} identifier of existing vehicle
- * @apiParam {string} id of exit
- * @apiParam {integer} epoch time - exit_time
- *
- * @apiSuccess {status} 202
- * @apiFailure {status} 500
- */
-app.put('/api/vehicle/exit', async (req, res) => {
-    const status = await db.updateVehicle(req.query.identifier,
-        req.query.id, parseFloat(req.query.time));
-    res.sendStatus(status);
+    try {
+        const status = await db.newVehicle(req.query.identifier, 
+            req.query.entrance_id, parseFloat(req.query.entrance_time),
+            req.query.exit_id, req.query.exit_time);
+        res.sendStatus(status);
+    } catch(e) {
+        console.error(e);
+        res.sendStatus(500);
+    }
 });
 
 /**

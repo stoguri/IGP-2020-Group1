@@ -37,44 +37,18 @@ module.exports.getPermissionLevel = async function(id) {
  * @param {time} entrance_time 
  * @returns {integer} status code
  */
-module.exports.newVehicle = async function(identifier, entrance_id, entrance_time) {
+module.exports.newVehicle = async function(identifier, entrance_id, entrance_time,
+        exit_id, exit_time) {
     try {
         await db.collection('vehicles').insertOne({
             identifier: identifier,
             entrance_id: entrance_id,
             entrance_time: entrance_time,
-            exit_id: null,
-            exit_time: null
+            exit_id: exit_id,
+            exit_time: exit_time
         });
 
         return 201;
-    } catch(e) {
-        console.error(e);
-        return 500;
-    }
-}
-
-/**
- * Updates existing vehicle record
- * @param {identifer} identifer of existing vehicle
- * @param {integer} exit_id 
- * @param {time} exit_time 
- * @returns {integer} status code
- */
-module.exports.updateVehicle = async function(identifier, exit_id, exit_time) {
-    try {
-        const collection = await db.collection("vehicles");
-
-        const filter = {$where: `this.identifier == ${identifier}`}
-        const update = {
-            $set: {
-                exit_id: exit_id,
-                exit_time: exit_time
-            }
-        };
-
-        await collection.updateOne(filter, update);
-        return 202;
     } catch(e) {
         console.error(e);
         return 500;
