@@ -19,11 +19,11 @@ client.connect(err => {
     }
 });
 
-module.exports.getPermissionLevel = async function(id) {
+module.exports.getPermissionLevel = async function(userID) {
     try {
         const collection = await db.collection('users');
-        const record = await collection.findOne({id: id});
-        return record.permissionLevel;
+        const record = await collection.findOne({id: userID});
+        return record.permission;
     } catch(e) {
         console.error(e);
         return null;

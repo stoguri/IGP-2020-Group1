@@ -44,9 +44,6 @@ app.get('/auth/login/auth0', passport.authenticate('auth0', {
 app.get('/auth/callback', passport.authenticate('auth0'), (req, res) => {
     req.session.user = req.user;
     req.session.auth = true;
-
-    console.log(req.session.user.displayName + " authenticated.");
-
     res.redirect('/');
 });
 
@@ -64,18 +61,15 @@ app.get('/auth/callback', passport.authenticate('auth0'), (req, res) => {
  * @apiFailure {status} 401, 404
  */
 app.get('/auth/login/headless', (req, res) => {
-    const status = auth.headlessLogin(req.query.username, req.query.password);
+    const status = auth.headlessLogin(req.query.id, req.query.password);
 
     if(status.toString()[0] == 2) {
         req.session.user = {
-            "displayName": req.query.username,
-            "id": `headless|${req.query.username}`
+            "displayName": req.query.id,
+            "id": `headless|${req.query.id}`
         };
         req.session.auth = true;
-
-        console.log(req.session.user.displayName + " authenticated.");
-
-        res.redirect('/');
+        res.sendStatus(200);
     } else {
         res.sendStatus(status);
     }    
@@ -83,7 +77,6 @@ app.get('/auth/login/headless', (req, res) => {
 
 app.get('/auth/logout', (req, res) => {
     req.session.destroy(function (err) {
-        res.redirect('/');
         res.end();
     });
 });
@@ -206,3 +199,11 @@ app.get('/api/vehicle', async (req, res) => {
         res.sendStatus(500);
     }
 });
+
+if(config.operationMode == "audit") {
+    app.get('/api/vehicle', async (req, res) => {
+        
+    })
+}
+
+module.exports = app;

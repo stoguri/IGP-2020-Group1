@@ -20,6 +20,10 @@ client.connect(err => {
         db.collection('vehicles').insertMany(testData.vehicles);
     
         // user records
+        // strip password out of json
+        for(let i = 0; i < testData.users.length; i++) {
+            delete testData.users[i].password;
+        }
         db.collection('users').insertMany(testData.users);
 
         console.log("Database populated, exit using ctrl+c");

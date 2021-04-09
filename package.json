@@ -33,6 +33,8 @@
     "node-fetch": "^2.6.1",
     "passport": "^0.4.1",
     "passport-auth0": "^1.4.0",
+    "supertest": "^6.1.3",
+    "supertest-session": "^4.1.0",
     "wavi": "^2.1.3"
   }
 }

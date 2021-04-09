@@ -5,10 +5,11 @@ const Auth0Strategy = require('passport-auth0');
 const crypto = require('crypto');
 
 const config = require('./config.json');
-const headlessUsers = require('./headlessUsers.json');
+let users_headless = require('./users.json').users_headless;
 
 if(config.operationMode == "test") {
-    headlessUsers.concat(require('./testHeadlessUsers.json'))
+    const testData = require('./db/testData.json');
+    users_headless = users_headless.concat(testData.users);
 }
 
 passport.serializeUser(function(user, done) {
@@ -42,8 +43,8 @@ passport.use(new Auth0Strategy(
 module.exports.headlessLogin = function(username, password) {
     // check if username exists
     function getUser(username) {
-        for(const user of headlessUsers) {
-            if(username == user.username) {
+        for(const user of users_headless) {
+            if(username == user.id) {
                 return user;
             }
         }

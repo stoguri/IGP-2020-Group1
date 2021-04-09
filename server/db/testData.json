@@ -10,16 +10,19 @@
     ],
     "users": [
         {
-            "id": "inferenceNetwork",
-            "permissionLevel": "writer"
+            "id": "testWriter",
+            "password": "passwordWriter123",
+            "permission": "writer"
         },
         {
-            "id": "117305262011507965191",
-            "permissionLevel": "admin"
+            "id": "testAdmin",
+            "password": "passwordAdmin123",
+            "permission": "admin"
         },
         {
-            "id": "100589479111199846728",
-            "permissionLevel": "basic"
+            "id": "testBasic",
+            "password": "passwordBasic123",
+            "permission": "basic"
         }
     ]
 }

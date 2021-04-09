@@ -1,160 +1,517 @@
 // tests for the server
 'use strict';
 
-const expect = require('chai').expect;
-const fetch = require("node-fetch");
 const crypto = require('crypto');
+const session = require('supertest-session');
 
 const config = require('../server/config.json');
-
-const testHeadlessUsers = require('../server/testHeadlessUsers.json');
-const headlessUser_writer = testHeadlessUsers[0];
-const headlessUser_admin = testHeadlessUsers[1];
-const headlessUser_basic = testHeadlessUsers[2];
+const app = require('../server/server.js');
 
 const testData = require('../server/db/testData.json');
 
-const url = `http://${config.network.domain}:${config.network.port}`;
+const writer = testData.users[0];
+const admin = testData.users[1];
+const basic = testData.users[2];
 
-// result depends partially on contents of testHeadlessUsers.json
-describe("Test headless login", function() {
-    const route_authCheck = '/auth/check';
-    const route_login = '/auth/login/headless';
+// %%% functions %%%
 
-    describe("Invalid username", function() { 
-        it("unauthenticated session before login attempt", async function() {
-            const response = await fetch(url + route_authCheck);
-            expect(response.status == 401);
-        })
-        it("login attempt returns status 404", async function() {
-            const response = await fetch(url + route_login + 
-                '?username=unregisteredUser&password=somePassword');
-            expect(response.status == 404);
+/**
+ * Searches for jsons with specific information
+ */
+function findJsons(vehicles, spec) {
+    const jsons = [];
+    for(const vehicle of vehicles) {
+        for(const key of Object.keys(spec)) {
+            if(vehicle[key] == spec[key]) {
+                jsons.push(vehicle);
+            }
+        }
+    }
+    return jsons;
+}
+
+function checkVehicleDataJSONs(expected, real) {
+    if(Object.keys(expected).length != Object.keys(real).length) {
+        return false;
+    }
+
+    if(Object.keys(expected.entrance).length != Object.keys(real.entrance).length) {
+        return false;
+    }
+    for(const key of Object.keys(expected.entrance)) {
+        if(expected.entrance[key] != real.entrance[key]) {
+            return false;
+        }
+    }
+
+    if(Object.keys(expected.exit).length != Object.keys(real.exit).length) {
+        return false;
+    }
+    for(const key of Object.keys(expected.exit)) {
+        if(expected.exit[key] != real.exit[key]) {
+            return false;
+        }
+    }
+
+    if(Object.keys(expected.route).length != Object.keys(real.route).length) {
+        return false;
+    }
+    for(const key of Object.keys(expected.route)) {
+        if(expected.route[key] != real.route[key]) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+
+let testSession;
+
+// %%% test cases %%%
+describe("Test headless login", () => {
+    let currentSession;
+
+    beforeEach(() => {
+        testSession = session(app);
+    });
+
+    describe("Invalid id", () => { 
+        it("Unauthenticated session before login attempt", (done) => {
+            testSession.get('/auth/check')
+                .expect(401)
+                .end((err) => {
+                    currentSession = testSession;
+
+                    if(err) {
+                        return done(err);
+                    }
+                    
+                    done();
+                });
         });
-        it("unauthenticated session after login attempt", async function() {
-            const response = await fetch(url + route_authCheck);
-            expect(response.status == 401);
-        })
-    })
-
-    describe("Valid username, invalid password", function() {
-        it("unauthenticated session before login attempt", async function() {
-            const response = await fetch(url + route_authCheck);
-            expect(response.status == 401);
-        })
-        it("login attempt returns status 401", async function() {
-            const response = await fetch(url + route_login + 
-                `?username=${headlessUser_writer.username}&password=somePassword`);
-            expect(response.status == 401);
+        it("Login attempt returns status 404", (done) => {
+            currentSession.get('/auth/login/headless')
+                .query(({id: "fakeID", password: "fakePassword"}))
+                .expect(404)
+                .end((err) => {
+                    if(err) {
+                        return done(err);
+                    }
+                    
+                    done();
+                });
         });
-        it("unauthenticated session after login attempt", async function() {
-            const response = await fetch(url + route_authCheck);
-            expect(response.status == 401);
-        })
-    })
+        it("Unauthenticated session after unsuccessful login attempt", (done) => {
+            currentSession.get('/auth/check')
+                .expect(401)
+                .end((err) => {
+                    if(err) {
+                        return done(err);
+                    }
+                    
+                    done();
+                });
+        });
+    });
 
-    describe("Valid credentials", function() {
-        it("unauthenticated session before login attempt", async function() {
-            const response = await fetch(url + route_authCheck);
-            expect(response.status == 401);
-        })
-        it("login attempt returns status 200", async function() {
+    describe("Valid id, invalid password", () => {
+        it("Unauthenticated session before login attempt", (done) => {
+            testSession.get('/auth/check')
+                .expect(401)
+                .end((err) => {
+                    currentSession = testSession;
+
+                    if(err) {
+                        return done(err);
+                    }
+                    
+                    done();
+                });
+        });
+        it("Login attempt returns status 401", (done) => {
+            currentSession.get('/auth/login/headless')
+                .query(({id: writer.id, password: "fakePassword"}))
+                .expect(401)
+                .end((err) => {
+                    if(err) {
+                        return done(err);
+                    }
+                    
+                    done();
+                });
+        });
+        it("Unauthenticated session after login attempt", (done) => {
+            currentSession.get('/auth/check')
+                .expect(401)
+                .end((err) => {
+                    if(err) {
+                        return done(err);
+                    }
+                    
+                    done();
+                });
+        });
+    });
+
+    describe("Valid id and password", () => {
+        it("Unauthenticated session before any login attempt", (done) => {
+            testSession.get('/auth/check')
+                .expect(401)
+                .end((err) => {
+                    currentSession = testSession;
+
+                    if(err) {
+                        return done(err);
+                    }
+                    
+                    done();
+                });
+        });
+        it("Login attempt returns status 200", (done) => {
             // get encrypted version of password
             const hash = crypto.createHash(config.auth.encryptionMethod);
-            hash.update(headlessUser_writer.password);
-        
-            const response = await fetch(url + route_login + 
-                `?username=${headlessUser_writer.username}&password=${hash.digest('hex')}`);
-            expect(response.status == 200);
-        })
-        it("authenticated session after login attempt", async function() {
-            const response = await fetch(url + route_authCheck);
-            expect(response.status == 204);
-        })
-        it("returns status 200 after logout attempt", async function() {
-            const response = await fetch(url + '/auth/logout');
-            expect(response.status == 200);
-        })
-        it("unauthenticated session after logout attempt", async function() {
-            const response = await fetch(url + route_authCheck);
-            expect(response.status == 401);
-        })
-    })
-})
+            hash.update(writer.password);
 
-describe("GET /api/vehicle/", function() {
-    const route = '/api/vehicle';
+            currentSession.get('/auth/login/headless')
+                .query(({id: writer.id, password: hash.digest('hex')}))
+                .expect(200)
+                .end((err) => {
+                    if(err) {
+                        return done(err);
+                    }
+                    done();
+                });
+        });
+        it("Authenticated session after successful login attempt ", (done) => {
+            currentSession.get('/auth/check')
+                .expect(204)
+                .end((err) => {
+                    if(err) {
+                        return done(err);
+                    }
 
-    describe("Access rights based on permission level", function() {
-        describe("Attempt to access with unauthenticated session", function() {
-            it("returns status 401 on access attempt", async function() {
-                const response = await fetch(url + route);
-                expect(response.status == 401);
-            })
-        })
+                    done();
+                });
+        });
+        it("Returns status 200 after logout attempt", (done) => {
+            currentSession.get('/auth/logout')
+                .expect(200)
+                .end((err) => {
+                    if(err) {
+                        return done(err);
+                    }
 
-        describe("Attempt to access with authenticated session as writer user", function () {            
-            it("returns status 401 on access attempt", async function() {
+                    done();
+                });
+        });
+        it("Unauthenticated session after logout attempt", (done) => {
+            currentSession.get('/auth/check')
+                .expect(401)
+                .end((err) => {
+                    if(err) {
+                        return done(err);
+                    }
+
+                    done();
+                });
+        });
+    });
+});
+
+describe("GET /api/vehicle/", () => {
+    let currentSession;
+
+    beforeEach(() => {
+        testSession = session(app);
+    });
+
+    describe("Access rights based on permission level", () => {
+        describe("Attempt to access with unauthenticated session", () => {
+            it("Returns status 401 on access attempt", (done) => {
+                testSession.get('/api/vehicle')
+                    .expect(401)
+                    .end((err) => {
+                        if(err) {
+                            return done(err);
+                        }
+
+                        done();
+                    });
+            });
+        });
+
+        describe("Attempt to access with authenticated session as writer user", () => {            
+            it("Login as writer user returns 200", (done) => {
                 // login as headless writer user
                 // get encrypted version of password
                 const hash = crypto.createHash(config.auth.encryptionMethod);
-                hash.update(headlessUser_writer.password);
+                hash.update(writer.password);
 
-                await fetch(url + '/auth/login/headless' +
-                    `?username=${headlessUser_writer.username}&password=${hash.digest('hex')}`);
-                
-                const response = await fetch(url + route);
-                expect(response.status == 401);
+                testSession.get('/auth/login/headless')
+                    .query(({id: writer.id, password: hash.digest('hex')}))
+                    .expect(200)
+                    .end((err) => {
+                        currentSession = testSession;
 
-                await fetch(url + '/auth/logout');
-            })
-        })
+                        if(err) {
+                            return done(err);
+                        }
+                        done();
+                    });
+            });
 
-        describe("Attempt to access with authenticated session as writer user", function () {            
-            it("returns status 202 on access attempt", async function() {
-                // login as headless admin user
+            it("Returns status 403 on access attempt", (done) => {
+                currentSession.get('/api/vehicle')
+                    .expect(403)
+                    .end((err) => {
+                        if(err) {
+                            return done(err);
+                        }
+                        done();
+                    });
+            });
+        });
+
+        describe("Attempt to access with authenticated session as admin user", () => {            
+            it("Login as admin user returns 200", (done) => {
+                // login as headless writer user
                 // get encrypted version of password
                 const hash = crypto.createHash(config.auth.encryptionMethod);
-                hash.update(headlessUser_admin.password);
+                hash.update(admin.password);
 
-                await fetch(url + '/auth/login/headless' +
-                    `?username=${headlessUser_admin.username}&password=${hash.digest('hex')}`);
-                
-                const response = await fetch(url + route);
-                expect(response.status == 202);
+                testSession.get('/auth/login/headless')
+                    .query(({id: admin.id, password: hash.digest('hex')}))
+                    .expect(200)
+                    .end((err) => {
+                        currentSession = testSession;
 
-                await fetch(url + '/auth/logout');
-            })
-        })
+                        if(err) {
+                            return done(err);
+                        }
+                        done();
+                    });
+            });
+            it("Returns status 200 on access attempt", (done) => {
+                currentSession.get('/api/vehicle')
+                    .expect(200)
+                    .expect('Content-Type', /json/)
+                    .expect((res) => {
+                        const expected = {
+                            entrance: {
+                                id0: 1, 
+                                id1: 0, 
+                                id2: 0, 
+                                id3: 0
+                            },
+                            exit: {
+                                id0: 0, 
+                                id1: 1, 
+                                id2: 0, 
+                                id3: 0
+                            },
+                            route: { 
+                                'id0-id1': 1,
+                                'id0-id2': 0,
+                                'id0-id3': 0,
+                                'id1-id0': 0,
+                                'id1-id2': 0,
+                                'id1-id3': 0,
+                                'id2-id0': 0,
+                                'id2-id1': 0,
+                                'id2-id3': 0,
+                                'id3-id0': 0,
+                                'id3-id1': 0,
+                                'id3-id2': 0
+                            }
+                        }
+                        if(!checkVehicleDataJSONs(expected, res.body)) {
+                            throw new Error("Expected vehicle data did not match received vehicle data");
+                        }
+                    })
+                    .end((err) => {
+                        if(err) {
+                            return done(err);
+                        }
+                        done();
+                    });
+            });
+        });
 
-        describe("Attempt to access with authenticated session as writer user", async function () {
-            it("returns status 202 on access attempt", async function() {
-                // login as headless basic user
+        describe("Attempt to access with authenticated session as basic user", () => {
+            it("Login as basic user returns 200", (done) => {
+                // login as headless writer user
                 // get encrypted version of password
                 const hash = crypto.createHash(config.auth.encryptionMethod);
-                hash.update(headlessUser_basic.password);
+                hash.update(basic.password);
 
-                await fetch(url + '/auth/login/headless' +
-                    `?username=${headlessUser_basic.username}&password=${hash.digest('hex')}`);
-                
-                const response = await fetch(url + route);
-                expect(response.status == 202);
+                testSession.get('/auth/login/headless')
+                    .query(({id: basic.id, password: hash.digest('hex')}))
+                    .expect(200)
+                    .end((err) => {
+                        currentSession = testSession;
 
-                await fetch(url + '/auth/logout');
+                        if(err) {
+                            return done(err);
+                        }
+                        done();
+                    });
+            });
+            it("Returns status 200 on access attempt", (done) => {
+                currentSession.get('/api/vehicle')
+                    .expect(200)
+                    .end((err) => {
+                        if(err) {
+                            return done(err);
+                        }
+                        done();
+                    });
+            });
+        });
+    });
+    
+    describe("Query paramters", () => {
+        describe("No parameters - all records", () => {
+            it("Login as basic user returns 200", (done) => {
+                // login as headless writer user
+                // get encrypted version of password
+                const hash = crypto.createHash(config.auth.encryptionMethod);
+                hash.update(basic.password);
+
+                testSession.get('/auth/login/headless')
+                    .query(({id: basic.id, password: hash.digest('hex')}))
+                    .expect(200)
+                    .end((err) => {
+                        currentSession = testSession;
+
+                        if(err) {
+                            return done(err);
+                        }
+                        done();
+                    });
+            });
+            it("Received data matches expected data", (done) => {
+                currentSession.get('/api/vehicle')
+                    .expect(200)
+                    .end((err) => {
+                        if(err) {
+                            return done(err);
+                        }
+                        done();
+                    });
+            });
+        });
+
+        /*
+        describe("Route information", function() {
+            describe("Entrance id only", function() {
+                const query = "?entrance_id=";
+
+                describe("Entrance id with no records", function() {
+                    it("Returns status 202", async function() {
+                        // login as headless basic user
+                        // get encrypted version of password
+                        const hash = crypto.createHash(config.auth.encryptionMethod);
+                        hash.update(basic.password);
+
+                        await fetch(url + '/auth/login/headless' +
+                        `?id=${basic.id}&password=${hash.digest('hex')}`);
+
+                        const url1 = "http://chungus.co.uk:7070/api/vehicle?entrance_id=fakeID";
+                        response = await fetch(url1);
+                        console.log(response);
+                        //response = await fetch(url + route + query + "id0"); 
+
+                        expect(response.status == 202);
+                    })
+
+                    it("No records found", async function() {
+                        const results = await response.json();
+
+                        console.log(results);
+
+                        expect(results.length == {});
+
+                        await fetch(url + '/auth/logout');
+                    })
+                })
             })
+            */
+
+            /*
+            //describe("Entrance id only", function() {
+                const query = "?entrance=";
+                console.log(url + route + query + "fakeID");
+                
+                describe("Entrance id with no records", function() {
+                    it("Returns status 202", async function() {
+                        response = await fetch(url + route + query + "fakeID");
+                        console.log(response);
+        
+                        expect(response.status == 202);
+                    })
+
+                    const results = response.json();
+
+                    it("No records found", function() {
+                        expect(results.length == 0);
+                    })
+                })
+
+
+                describe("Entrance id with one vehicle record", function() {
+                    const id = "id0";
+
+                    it("Returns status 202", async function() {
+                        response = await fetch(url + route + query + id);
+        
+                        expect(response.status == 202);
+                    })
+
+                    const results = response.json();
+
+                    it("One record found", function() {
+                        expect(results.length == 1);
+                    })
+    
+                    it("Record data matches expected data", async function() {
+                        expect(results == findJsons(testData.vehicles,
+                            {"entrance_id": id}));
+                    })
+                })
+            //})
+            */
+
+            /*
+            describe("Exit id only", function() {
+                it("Returns status 202", async function() {
+                    // login as headless basic user
+                    // get encrypted version of password
+                    const hash = crypto.createHash(config.auth.encryptionMethod);
+                    hash.update(basic.password);
+    
+                    await fetch(url + '/auth/login/headless' +
+                    `?id=${basic.id}&password=${hash.digest('hex')}`);
+    
+                    response = await fetch(url + route);
+    
+                    expect(response.status == 202);
+                })
+
+                it("Received data matches expected data", async function() {
+                    expect(response.json() == findJsons(testData.vehicles,
+                        {"exit_id": "id1"}));
+    
+                    await fetch(url + '/auth/logout');
+                })
+            })
+            
+            // full route ids
         })
-    })
-
-    // results depedent on testData.json
-    describe("Query paramters", function() {
-        // no parameters - all data
-
-        // entrance id only
-        // exit id only
-        // full route ids
+        */
         
         // entrance time only
         // exit time only
         // full route times
     })
-})
+});
