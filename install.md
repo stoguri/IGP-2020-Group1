@@ -3,7 +3,7 @@
 * [Node.js](https://nodejs.org/en/download/ "Node.js download"), version 6.9.0 or newer.
 * [MongoDB Shell](https://www.mongodb.com/try/download/shell "MongoDB Shell download"), version 4.4.2 or newer - this should be running as a service when deploying this application.
 
-# Setting up authentication
+# Setting up Auth0 authentication
 To set up user authentication go to <https://manage.auth0.com/>.
 
 1. Create a single page JavaScript web application.
@@ -13,7 +13,7 @@ To set up user authentication go to <https://manage.auth0.com/>.
 5. Put "%YOURDOMAIN&:%YOURPORT%" in the "Allowed Web Origins" box.
 6. Save changes.
 
-# Running the application
+# Deploying the application
 
 Navigate to the desired install directory.
 
@@ -49,21 +49,37 @@ Create the config.json file in the server directory.
         "port": "{integer} user defined",
         "name": "{string} user defined"
     },
-    "junction": ["{[string]} list of entrance ids"],
+    "entrances": ["{[string]} list of entrance ids"],
     "operationMode": "{string} deployment, audit or test"
 }
 ```
 
-Create the headlessUsers.json file in the server directory. Add any users that require headless login to this json. The password string should be unencrypted in this file, when login requests are made the passwords should be encrypted using MD5 encryption.
+Create the users.json file in the server directory. Add Auth0 users and headless users to this json. Auth0 users are users that can authenticated with the graphical Auth0 strategy, this will be any end users. Headless users are users that cannot use the Auth0 strategy to login, the inference network should be one of these users.
 
-## headlessUsers.json structure
+There are three permission levels for a user: writer, admin and basic. A writer user can only send vehicle information to the application, this is the role of inference network. The admin and basic users are both end users, they may both use the API functions that serve vehicle data. The admin user has some additional privaledges these are:
+
+* Add and remove basic users.
+* Change the mode of operation.
+
+The password string should be unencrypted in this file, when login requests are made the passwords should be encrypted using the encryption method specified in the config.json.
+
+## users.json structure
 ```json
-[
-    {
-        "username": "{string} user defined",
-        "password": "{string} user defined"
-    }
-]
+{
+    "users": [
+        {
+            "id": "Google ID",
+            "permission": "{string} user defined - must be admin or basic"
+        }
+    ],
+    "users_headless": [
+        {
+            "id": "inferenceNetwork",
+            "password": "password123",
+            "permission": "writer"
+        }
+    ]
+}
 ```
 
 Initiliase the database by using the command:
@@ -74,6 +90,11 @@ npm run db_init
 The database can be populated by test data by using the command:
 ```bash
 npm run db_populate
+```
+
+The application can be tested by using the command:
+```bash
+npm test
 ```
 
 Run the application on the specified domain using the command: 
