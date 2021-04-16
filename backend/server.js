@@ -92,6 +92,7 @@ app.get('/auth/logout', (req, res) => {
  * @apiFailure {status} 401
  */
 app.get('/auth/check', (req, res) => {
+    console.log("got auth check request");
     if(req.session.auth) {
         res.sendStatus(204);
     } else {
