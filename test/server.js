@@ -70,23 +70,20 @@ describe("Test headless login", () => {
                 .expect(401)
                 .end((err) => {
                     currentSession = testSession;
-
                     if(err) {
                         return done(err);
                     }
-                    
                     done();
                 });
         });
         it("Login attempt returns status 404", (done) => {
             currentSession.get('/auth/login/headless')
-                .query(({id: "fakeID", password: "fakePassword"}))
+                .query({id: "fakeID", password: "fakePassword"})
                 .expect(404)
                 .end((err) => {
                     if(err) {
                         return done(err);
                     }
-                    
                     done();
                 });
         });
@@ -97,7 +94,6 @@ describe("Test headless login", () => {
                     if(err) {
                         return done(err);
                     }
-                    
                     done();
                 });
         });
@@ -109,23 +105,20 @@ describe("Test headless login", () => {
                 .expect(401)
                 .end((err) => {
                     currentSession = testSession;
-
                     if(err) {
                         return done(err);
                     }
-                    
                     done();
                 });
         });
         it("Login attempt returns status 401", (done) => {
             currentSession.get('/auth/login/headless')
-                .query(({id: writer.id, password: "fakePassword"}))
+                .query({id: writer.id, password: "fakePassword"})
                 .expect(401)
                 .end((err) => {
                     if(err) {
                         return done(err);
                     }
-                    
                     done();
                 });
         });
@@ -136,7 +129,6 @@ describe("Test headless login", () => {
                     if(err) {
                         return done(err);
                     }
-                    
                     done();
                 });
         });
@@ -148,11 +140,9 @@ describe("Test headless login", () => {
                 .expect(401)
                 .end((err) => {
                     currentSession = testSession;
-
                     if(err) {
                         return done(err);
                     }
-                    
                     done();
                 });
         });
@@ -162,7 +152,7 @@ describe("Test headless login", () => {
             hash.update(writer.password);
 
             currentSession.get('/auth/login/headless')
-                .query(({id: writer.id, password: hash.digest('hex')}))
+                .query({id: writer.id, password: hash.digest('hex')})
                 .expect(200)
                 .end((err) => {
                     if(err) {
@@ -178,7 +168,6 @@ describe("Test headless login", () => {
                     if(err) {
                         return done(err);
                     }
-
                     done();
                 });
         });
@@ -189,7 +178,6 @@ describe("Test headless login", () => {
                     if(err) {
                         return done(err);
                     }
-
                     done();
                 });
         });
@@ -200,7 +188,6 @@ describe("Test headless login", () => {
                     if(err) {
                         return done(err);
                     }
-
                     done();
                 });
         });
@@ -223,7 +210,6 @@ describe("GET /api/vehicle/", () => {
                         if(err) {
                             return done(err);
                         }
-
                         done();
                     });
             });
@@ -237,11 +223,10 @@ describe("GET /api/vehicle/", () => {
                 hash.update(writer.password);
 
                 testSession.get('/auth/login/headless')
-                    .query(({id: writer.id, password: hash.digest('hex')}))
+                    .query({id: writer.id, password: hash.digest('hex')})
                     .expect(200)
                     .end((err) => {
                         currentSession = testSession;
-
                         if(err) {
                             return done(err);
                         }
@@ -269,11 +254,10 @@ describe("GET /api/vehicle/", () => {
                 hash.update(admin.password);
 
                 testSession.get('/auth/login/headless')
-                    .query(({id: admin.id, password: hash.digest('hex')}))
+                    .query({id: admin.id, password: hash.digest('hex')})
                     .expect(200)
                     .end((err) => {
                         currentSession = testSession;
-
                         if(err) {
                             return done(err);
                         }
@@ -300,11 +284,10 @@ describe("GET /api/vehicle/", () => {
                 hash.update(basic.password);
 
                 testSession.get('/auth/login/headless')
-                    .query(({id: basic.id, password: hash.digest('hex')}))
+                    .query({id: basic.id, password: hash.digest('hex')})
                     .expect(200)
                     .end((err) => {
                         currentSession = testSession;
-
                         if(err) {
                             return done(err);
                         }
@@ -333,11 +316,10 @@ describe("GET /api/vehicle/", () => {
                 hash.update(basic.password);
 
                 testSession.get('/auth/login/headless')
-                    .query(({id: basic.id, password: hash.digest('hex')}))
+                    .query({id: basic.id, password: hash.digest('hex')})
                     .expect(200)
                     .end((err) => {
                         currentSession = testSession;
-
                         if(err) {
                             return done(err);
                         }
@@ -391,116 +373,422 @@ describe("GET /api/vehicle/", () => {
             });
         });
 
-        /*
-        describe("Route information", function() {
-            describe("Entrance id only", function() {
-                const query = "?entrance_id=";
-
-                describe("Entrance id with no records", function() {
-                    it("Returns status 202", async function() {
-                        // login as headless basic user
+        describe("Query route information", () => {
+            describe("Entrance ID only", () => {
+                describe("Invalid entrance ID", () => {
+                    it("Login as basic user returns 200", (done) => {
+                        // login as headless writer user
                         // get encrypted version of password
                         const hash = crypto.createHash(config.auth.encryptionMethod);
                         hash.update(basic.password);
-
-                        await fetch(url + '/auth/login/headless' +
-                        `?id=${basic.id}&password=${hash.digest('hex')}`);
-
-                        const url1 = "http://chungus.co.uk:7070/api/vehicle?entrance_id=fakeID";
-                        response = await fetch(url1);
-                        console.log(response);
-                        //response = await fetch(url + route + query + "id0"); 
-
-                        expect(response.status == 202);
-                    })
-
-                    it("No records found", async function() {
-                        const results = await response.json();
-
-                        console.log(results);
-
-                        expect(results.length == {});
-
-                        await fetch(url + '/auth/logout');
-                    })
-                })
-            })
-            */
-
-            /*
-            //describe("Entrance id only", function() {
-                const query = "?entrance=";
-                console.log(url + route + query + "fakeID");
-                
-                describe("Entrance id with no records", function() {
-                    it("Returns status 202", async function() {
-                        response = await fetch(url + route + query + "fakeID");
-                        console.log(response);
         
-                        expect(response.status == 202);
-                    })
-
-                    const results = response.json();
-
-                    it("No records found", function() {
-                        expect(results.length == 0);
-                    })
+                        testSession.get('/auth/login/headless')
+                            .query({id: basic.id, password: hash.digest('hex')})
+                            .expect(200)
+                            .end((err) => {
+                                currentSession = testSession;
+                                if(err) {
+                                    return done(err);
+                                }
+                                done();
+                            });
+                    });
+                    it("Received data matches expected data", (done) => {
+                        currentSession.get('/api/vehicle')
+                            .query({entrance_id: "fakeID"})
+                            .expect(200)
+                            .expect('Content-Type', /json/)
+                            .expect((res) => {
+                                const expected = {
+                                    entrance: {
+                                        id0: 0, 
+                                        id1: 0, 
+                                        id2: 0, 
+                                        id3: 0
+                                    },
+                                    exit: {
+                                        id0: 0, 
+                                        id1: 0, 
+                                        id2: 0, 
+                                        id3: 0
+                                    },
+                                    route: { 
+                                        'id0-id1': 0,
+                                        'id0-id2': 0,
+                                        'id0-id3': 0,
+                                        'id1-id0': 0,
+                                        'id1-id2': 0,
+                                        'id1-id3': 0,
+                                        'id2-id0': 0,
+                                        'id2-id1': 0,
+                                        'id2-id3': 0,
+                                        'id3-id0': 0,
+                                        'id3-id1': 0,
+                                        'id3-id2': 0
+                                    }
+                                }
+                                const validity = checkVehicleDataJSONs(expected, res.body);
+                                if(validity instanceof Error) {
+                                    throw validity;
+                                }
+                            })
+                            .end((err) => {
+                                if(err) {
+                                    return done(err);
+                                }
+                                done();
+                            });
+                    });
                 })
 
-
-                describe("Entrance id with one vehicle record", function() {
-                    const id = "id0";
-
-                    it("Returns status 202", async function() {
-                        response = await fetch(url + route + query + id);
+                describe("Records with entrnace ID: id0", () => {
+                    it("Login as basic user returns 200", (done) => {
+                        // login as headless writer user
+                        // get encrypted version of password
+                        const hash = crypto.createHash(config.auth.encryptionMethod);
+                        hash.update(basic.password);
         
-                        expect(response.status == 202);
-                    })
+                        testSession.get('/auth/login/headless')
+                            .query({id: basic.id, password: hash.digest('hex')})
+                            .expect(200)
+                            .end((err) => {
+                                currentSession = testSession;
+                                if(err) {
+                                    return done(err);
+                                }
+                                done();
+                            });
+                    });
+                    it("Received data matches expected data", (done) => {
+                        currentSession.get('/api/vehicle')
+                            .query({entrance_id: "id0"})
+                            .expect(200)
+                            .expect('Content-Type', /json/)
+                            .expect((res) => {
+                                const expected = {
+                                    entrance: {
+                                        id0: 3, 
+                                        id1: 0, 
+                                        id2: 0, 
+                                        id3: 0
+                                    },
+                                    exit: {
+                                        id0: 0, 
+                                        id1: 2, 
+                                        id2: 0, 
+                                        id3: 1
+                                    },
+                                    route: { 
+                                        'id0-id1': 2,
+                                        'id0-id2': 0,
+                                        'id0-id3': 1,
+                                        'id1-id0': 0,
+                                        'id1-id2': 0,
+                                        'id1-id3': 0,
+                                        'id2-id0': 0,
+                                        'id2-id1': 0,
+                                        'id2-id3': 0,
+                                        'id3-id0': 0,
+                                        'id3-id1': 0,
+                                        'id3-id2': 0
+                                    }
+                                }
+                                const validity = checkVehicleDataJSONs(expected, res.body);
+                                if(validity instanceof Error) {
+                                    throw validity;
+                                }
+                            })
+                            .end((err) => {
+                                if(err) {
+                                    return done(err);
+                                }
+                                done();
+                            });
+                    });
+                });
+            });
 
-                    const results = response.json();
-
-                    it("One record found", function() {
-                        expect(results.length == 1);
-                    })
-    
-                    it("Record data matches expected data", async function() {
-                        expect(results == findJsons(testData.vehicles,
-                            {"entrance_id": id}));
-                    })
+            describe("Exit ID only", () => {
+                describe("Invalid exit ID", () => {
+                    it("Login as basic user returns 200", (done) => {
+                        // login as headless writer user
+                        // get encrypted version of password
+                        const hash = crypto.createHash(config.auth.encryptionMethod);
+                        hash.update(basic.password);
+        
+                        testSession.get('/auth/login/headless')
+                            .query({id: basic.id, password: hash.digest('hex')})
+                            .expect(200)
+                            .end((err) => {
+                                currentSession = testSession;
+                                if(err) {
+                                    return done(err);
+                                }
+                                done();
+                            });
+                    });
+                    it("Received data matches expected data", (done) => {
+                        currentSession.get('/api/vehicle')
+                            .query({exit_id: "fakeID"})
+                            .expect(200)
+                            .expect('Content-Type', /json/)
+                            .expect((res) => {
+                                const expected = {
+                                    entrance: {
+                                        id0: 0, 
+                                        id1: 0, 
+                                        id2: 0, 
+                                        id3: 0
+                                    },
+                                    exit: {
+                                        id0: 0, 
+                                        id1: 0, 
+                                        id2: 0, 
+                                        id3: 0
+                                    },
+                                    route: { 
+                                        'id0-id1': 0,
+                                        'id0-id2': 0,
+                                        'id0-id3': 0,
+                                        'id1-id0': 0,
+                                        'id1-id2': 0,
+                                        'id1-id3': 0,
+                                        'id2-id0': 0,
+                                        'id2-id1': 0,
+                                        'id2-id3': 0,
+                                        'id3-id0': 0,
+                                        'id3-id1': 0,
+                                        'id3-id2': 0
+                                    }
+                                }
+                                const validity = checkVehicleDataJSONs(expected, res.body);
+                                if(validity instanceof Error) {
+                                    throw validity;
+                                }
+                            })
+                            .end((err) => {
+                                if(err) {
+                                    return done(err);
+                                }
+                                done();
+                            });
+                    });
                 })
-            //})
-            */
 
-            /*
-            describe("Exit id only", function() {
-                it("Returns status 202", async function() {
-                    // login as headless basic user
-                    // get encrypted version of password
-                    const hash = crypto.createHash(config.auth.encryptionMethod);
-                    hash.update(basic.password);
-    
-                    await fetch(url + '/auth/login/headless' +
-                    `?id=${basic.id}&password=${hash.digest('hex')}`);
-    
-                    response = await fetch(url + route);
-    
-                    expect(response.status == 202);
-                })
+                describe("Records with exit ID: id1", () => {
+                    it("Login as basic user returns 200", (done) => {
+                        // login as headless writer user
+                        // get encrypted version of password
+                        const hash = crypto.createHash(config.auth.encryptionMethod);
+                        hash.update(basic.password);
+        
+                        testSession.get('/auth/login/headless')
+                            .query({id: basic.id, password: hash.digest('hex')})
+                            .expect(200)
+                            .end((err) => {
+                                currentSession = testSession;
+                                if(err) {
+                                    return done(err);
+                                }
+                                done();
+                            });
+                    });
+                    it("Received data matches expected data", (done) => {
+                        currentSession.get('/api/vehicle')
+                            .query({exit_id: "id1"})
+                            .expect(200)
+                            .expect('Content-Type', /json/)
+                            .expect((res) => {
+                                const expected = {
+                                    entrance: {
+                                        id0: 2, 
+                                        id1: 0, 
+                                        id2: 1, 
+                                        id3: 0
+                                    },
+                                    exit: {
+                                        id0: 0, 
+                                        id1: 3, 
+                                        id2: 0, 
+                                        id3: 0
+                                    },
+                                    route: { 
+                                        'id0-id1': 2,
+                                        'id0-id2': 0,
+                                        'id0-id3': 0,
+                                        'id1-id0': 0,
+                                        'id1-id2': 0,
+                                        'id1-id3': 0,
+                                        'id2-id0': 0,
+                                        'id2-id1': 1,
+                                        'id2-id3': 0,
+                                        'id3-id0': 0,
+                                        'id3-id1': 0,
+                                        'id3-id2': 0
+                                    }
+                                }
+                                const validity = checkVehicleDataJSONs(expected, res.body);
+                                if(validity instanceof Error) {
+                                    throw validity;
+                                }
+                            })
+                            .end((err) => {
+                                if(err) {
+                                    return done(err);
+                                }
+                                done();
+                            });
+                    });
+                });
+            });
 
-                it("Received data matches expected data", async function() {
-                    expect(response.json() == findJsons(testData.vehicles,
-                        {"exit_id": "id1"}));
-    
-                    await fetch(url + '/auth/logout');
-                })
-            })
-            
-            // full route ids
-        })
-        */
+            describe("Full route", () => {
+                describe("Invalid route: id0 -> id0", () => {
+                    it("Login as basic user returns 200", (done) => {
+                        // login as headless writer user
+                        // get encrypted version of password
+                        const hash = crypto.createHash(config.auth.encryptionMethod);
+                        hash.update(basic.password);
+        
+                        testSession.get('/auth/login/headless')
+                            .query({id: basic.id, password: hash.digest('hex')})
+                            .expect(200)
+                            .end((err) => {
+                                currentSession = testSession;
+                                if(err) {
+                                    return done(err);
+                                }
+                                done();
+                            });
+                    });
+                    it("Received data matches expected data", (done) => {
+                        currentSession.get('/api/vehicle')
+                            .query({entrance_id: "id0", exit_id: "id0"})
+                            .expect(200)
+                            .expect('Content-Type', /json/)
+                            .expect((res) => {
+                                const expected = {
+                                    entrance: {
+                                        id0: 0, 
+                                        id1: 0, 
+                                        id2: 0, 
+                                        id3: 0
+                                    },
+                                    exit: {
+                                        id0: 0, 
+                                        id1: 0, 
+                                        id2: 0, 
+                                        id3: 0
+                                    },
+                                    route: { 
+                                        'id0-id1': 0,
+                                        'id0-id2': 0,
+                                        'id0-id3': 0,
+                                        'id1-id0': 0,
+                                        'id1-id2': 0,
+                                        'id1-id3': 0,
+                                        'id2-id0': 0,
+                                        'id2-id1': 0,
+                                        'id2-id3': 0,
+                                        'id3-id0': 0,
+                                        'id3-id1': 0,
+                                        'id3-id2': 0
+                                    }
+                                }
+                                const validity = checkVehicleDataJSONs(expected, res.body);
+                                if(validity instanceof Error) {
+                                    throw validity;
+                                }
+                            })
+                            .end((err) => {
+                                if(err) {
+                                    return done(err);
+                                }
+                                done();
+                            });
+                    });
+                });
+
+                describe("Route: id0 -> id1", () => {
+                    it("Login as basic user returns 200", (done) => {
+                        // login as headless writer user
+                        // get encrypted version of password
+                        const hash = crypto.createHash(config.auth.encryptionMethod);
+                        hash.update(basic.password);
+        
+                        testSession.get('/auth/login/headless')
+                            .query({id: basic.id, password: hash.digest('hex')})
+                            .expect(200)
+                            .end((err) => {
+                                currentSession = testSession;
+                                if(err) {
+                                    return done(err);
+                                }
+                                done();
+                            });
+                    });
+                    it("Received data matches expected data", (done) => {
+                        currentSession.get('/api/vehicle')
+                            .query({entrance_id: "id0", exit_id: "id1"})
+                            .expect(200)
+                            .expect('Content-Type', /json/)
+                            .expect((res) => {
+                                const expected = {
+                                    entrance: {
+                                        id0: 2, 
+                                        id1: 0, 
+                                        id2: 0, 
+                                        id3: 0
+                                    },
+                                    exit: {
+                                        id0: 0, 
+                                        id1: 2, 
+                                        id2: 0, 
+                                        id3: 0
+                                    },
+                                    route: { 
+                                        'id0-id1': 2,
+                                        'id0-id2': 0,
+                                        'id0-id3': 0,
+                                        'id1-id0': 0,
+                                        'id1-id2': 0,
+                                        'id1-id3': 0,
+                                        'id2-id0': 0,
+                                        'id2-id1': 0,
+                                        'id2-id3': 0,
+                                        'id3-id0': 0,
+                                        'id3-id1': 0,
+                                        'id3-id2': 0
+                                    }
+                                }
+                                const validity = checkVehicleDataJSONs(expected, res.body);
+                                if(validity instanceof Error) {
+                                    throw validity;
+                                }
+                            })
+                            .end((err) => {
+                                if(err) {
+                                    return done(err);
+                                }
+                                done();
+                            });
+                    });
+                });
+            });
+        });
         
         // entrance time only
+        // - exact
+        // - before
+        // - after
+
         // exit time only
+        // - exact
+        // - before
+        // - after
+
         // full route times
+        // - inclusive
+        // - exclusive
     })
 });
