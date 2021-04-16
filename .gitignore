@@ -2,4 +2,3 @@ node_modules
 bin
 config.json
 users.json
-/package-lock.json

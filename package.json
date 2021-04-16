@@ -5,9 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha --reporter spec",
-    "start": "node server/server.js",
-    "db_init": "node server/db/init.js",
-    "db_populate": "node server/db/populate.js",
+    "start": "node backend/server.js",
+    "db_init": "node backend/db/init.js",
+    "db_populate": "node backend/db/populate.js",
     "wavi_generate": "wavi ./ ./bin/graph.svg",
     "apidoc_generate": "node ./apidocTest.js"
   },
