@@ -1,5 +1,5 @@
 import React from 'react';
-import Container from '@material-ui/core/Container'
+import Box from '@material-ui/core/Box'
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import { DataGrid } from '@material-ui/data-grid';
@@ -26,16 +26,16 @@ function Main() {
 
   return (
     <main className="App-header">
-      <Container id='main-grid'>
-        <Container id='upper-grid'>
-          <Container id='large-video-wrapper'>
+      <Box id='main-grid'>
+        <Box id='upper-grid'>
+          <Box id='large-video-wrapper'>
             Large Video
-          </Container>
-          <Container id='main-data-table'>
+          </Box>
+          <Box id='main-data-table'>
             <DataGrid id='datagrid' rows={rows} columns={columns} pageSize={10} />
-          </Container>
-        </Container>
-        <Container id='lower-grid'>
+          </Box>
+        </Box>
+        <Box id='lower-grid'>
           <List id='video-sub-list'>
             <ListItem className='video-list-item'>
               Video 2
@@ -50,8 +50,8 @@ function Main() {
               Video 5
             </ListItem>
           </List>
-        </Container>
-      </Container>
+        </Box>
+      </Box>
     </main>
   );
 }

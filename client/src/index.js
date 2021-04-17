@@ -1,15 +1,17 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import reportWebVitals from './services/reportWebVitals';
-import './index.css';
-import App from './components/App';
-
+import { BrowserRouter } from 'react-router-dom';
+import { makeStyles } from '@material-ui/core/styles';
+import reportWebVitals from './Services/Logging/reportWebVitals';
+import App from './App.js';
 
 
 // Render App component into the browser
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <BrowserRouter>
+      <App/>
+    </BrowserRouter>
   </React.StrictMode>,
   document.getElementById('root')
 );
