@@ -19,8 +19,13 @@ const server = app.listen(config.network.port, () => {
         config.network.domain + ':' + config.network.port);
 });
 
+// app.all('/*', function(req, res, next) {
+//     res.header("Access-Control-Allow-Origin", "*");
+//     next();
+// });
+
 app.use('/', express.static('client', {'extensions': ['html']}));
-app.use(cors());
+// app.use(cors());
 
 app.use(session({
     secret: 'mySecret',
@@ -40,8 +45,11 @@ app.use(passport.session());
 app.get('/auth/login/auth0', passport.authenticate('auth0', {
         // define what user info is sent
         scope: ['openid', 'profile'],
+    }), (req, res) => {
+        // handle authentication success/failure here
+        res.redirect("/");
     }
-));
+);
 
 app.get('/auth/callback', passport.authenticate('auth0'), (req, res) => {
     req.session.user = req.user;

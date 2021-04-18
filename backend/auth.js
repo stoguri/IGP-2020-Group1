@@ -27,7 +27,8 @@ passport.use(new Auth0Strategy(
         domain: config.auth.domain,
         clientID: config.auth.clientID,
         clientSecret: config.auth.clientSecret,
-        callbackURL: `http://${config.network.domain}:${config.network.port}/auth/callback`
+        //callbackURL: `http://${config.network.domain}:${config.network.port}/auth/callback`
+        callbackURL: `http://${config.network.domain}:8080/auth/callback`
     }, 
     (accessToken, refreshToken, extraParams, profile, done) => {
         return done(null, profile);
