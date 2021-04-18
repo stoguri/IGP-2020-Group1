@@ -11,10 +11,11 @@ const useStyles = makeStyles({
         display: "flex",
         flexDirection: "row",
         justifyContent: "center",
-        height: '9%'
+        height: '8vh'
     },
     title: {
-        position: 'fixed'
+        position: 'fixed',
+        fontSize: 'calc(1em + 3vw)'
     },
     button: {
         height: '40%',
@@ -54,7 +55,7 @@ export default function Topbar(props) {
     return (
         <AppBar className={classes.root}>
             <Typography className={classes.title} variant='h1'>{header}</Typography>
-            <Button className={classes.button} onClick={LoginLogout(button)} variant='contained'>{button}</Button>
+            <Button className={classes.button} onClick={() => {LoginLogout(button)}} variant='contained'>{button}</Button>
         </AppBar>          
     );
 }

@@ -2,8 +2,8 @@ import React from 'react';
 import { Router, Switch, Route } from 'react-router-dom'
 import { makeStyles } from '@material-ui/core/styles'
 import { Box } from '@material-ui/core'
-import HomeView from './Views/HomeView.js'
-import LoginView from './Views/LoginView.js'
+import HomeView from './Views/HomeView'
+import LoginView from './Views/LoginView'
 
 
 
@@ -14,7 +14,8 @@ Single Page Application - Dynamically render components into this view from './C
 const useStyles = makeStyles({
     wrapper: {
         maxHeight: "100vh",
-        maxWidth: "100vw"
+        maxWidth: "100vw",
+        overflowX: 'hidden'
     }
 })
 
@@ -24,8 +25,8 @@ export default function App() {
     return (
         <Box className={classes.wrapper}>
             <Switch>
-                <Route path='/' component={LoginView} />
-                <Route path='/Home' component={HomeView} />
+                <Route path='/' component={LoginView} exact />
+                <Route path='/home' component={HomeView} />
             </Switch>
         </Box>
     );
