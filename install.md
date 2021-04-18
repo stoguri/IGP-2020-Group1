@@ -10,7 +10,6 @@ To set up user authentication go to <https://manage.auth0.com/>.
 2. Go to application settings.
 3. Put "%YOURDOMAIN%:%YOURPORT%/auth/callback" in the "Allowed Callbacks URLs" box.
 4. Put "%YOURDOMAIN%:%YOURPORT%" in the "Allowed Logout URLs" box.
-5. Put "%YOURDOMAIN&:%YOURPORT%" in the "Allowed Web Origins" box.
 6. Save changes.
 
 # Deploying the application
