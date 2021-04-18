@@ -1,7 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { BrowserRouter } from 'react-router-dom';
-import { makeStyles } from '@material-ui/core/styles';
 import reportWebVitals from './Services/Logging/reportWebVitals';
 import App from './App.js';
 

@@ -14,6 +14,8 @@ const config = require('./config.json');
 
 const app = express();
 
+app.use(cors())
+
 const server = app.listen(config.network.port, () => {
     console.log(`Server running is ${config.operationMode} mode, listening on: ` +
         config.network.domain + ':' + config.network.port);
@@ -24,8 +26,7 @@ const server = app.listen(config.network.port, () => {
 //     next();
 // });
 
-app.use('/', express.static('client', {'extensions': ['html']}));
-// app.use(cors());
+app.use('/', express.static('./client/', {'extensions': ['html']}));
 
 app.use(session({
     secret: 'mySecret',
@@ -47,6 +48,7 @@ app.get('/auth/login/auth0', passport.authenticate('auth0', {
         scope: ['openid', 'profile'],
     }), (req, res) => {
         // handle authentication success/failure here
+        res.set(access-control-allow-origin)
         res.redirect("/");
     }
 );

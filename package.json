@@ -2,14 +2,15 @@
   "name": "trafficsurveillanceappgui",
   "version": "1.0.0",
   "description": "A web interface for a traffic surveillance application",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
     "test": "mocha --reporter spec",
     "start": "node backend/server.js",
     "db_init": "node backend/db/init.js",
     "db_populate": "node backend/db/populate.js",
     "wavi_generate": "wavi ./ ./bin/graph.svg",
-    "apidoc_generate": "node ./apidocTest.js"
+    "apidoc_generate": "node ./apidocTest.js",
+    "build": "cd ../client && npm install && npm run build"
   },
   "repository": {
     "type": "git",
@@ -25,12 +26,14 @@
     "apidoc": "^0.26.0",
     "auth0": "^2.33.0",
     "chai": "^4.3.0",
+    "cors": "^2.8.5",
     "crypto": "^1.0.1",
     "express": "^4.17.1",
     "express-session": "^1.17.1",
     "mocha": "^8.3.0",
     "mongodb": "^3.6.4",
     "node-fetch": "^2.6.1",
+    "nodemon": "^2.0.7",
     "passport": "^0.4.1",
     "passport-auth0": "^1.4.0",
     "supertest": "^6.1.3",
