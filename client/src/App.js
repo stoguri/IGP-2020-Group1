@@ -24,10 +24,8 @@ export default function App() {
     const classes = useStyles()
     return (
         <Box className={classes.wrapper}>
-            <Switch>
-                <Route path='/' component={LoginView} exact />
-                <Route path='/home' component={HomeView} />
-            </Switch>
+            <LoginView />
+            <HomeView />
         </Box>
     );
 }

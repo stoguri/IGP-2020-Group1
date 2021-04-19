@@ -25,44 +25,17 @@ const useStyles = makeStyles({
     }
 });
 
-function LoginLogout(view) {
-    if (view === "Login") {
-        // const response = await fetch('http://localhost:8080/auth/login/auth0');
-        // if (!response.ok) {
-        //     alert('Error logging in. Please try again')
-        // }
-        if (window.location.assign("http://localhost:8080/auth/login/auth0")) {
-            window.location.pathname = "/home"
-        }
-        
-    } else {
-        if (window.location.assign("http://localhost:8080/auth/logout")) {
-            window.location.pathname = "/"
-        }
-    }
-}
-
 const LoginTopbar = (props) => {
 
-    const { loginWithRedirect } = useAuth0()
-    let header;
-    let button;
-
-    if (props.view === 'LoginView') {
-        header = "IGP-2020-Group1";
-        button = "Login";
-    } else {
-        header = "Traffic Surveillance";
-        button = "Logout";
-    }
+    const { loginWithRedirect, isAuthenticated } = useAuth0()
 
     const classes = useStyles();
     return (
         <AppBar className={classes.root}>
-            <Typography className={classes.title} variant='h1'>{header}</Typography>
+            <Typography className={classes.title} variant='h1'>IGP-2020-Group1</Typography>
             <Button className={classes.button} onClick={() => loginWithRedirect()} variant='contained'>login</Button>
-        </AppBar>          
-    );
+        </AppBar>
+    )
 }
 
 export default LoginTopbar;

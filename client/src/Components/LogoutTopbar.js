@@ -27,13 +27,15 @@ const useStyles = makeStyles({
 
 const LogoutTopbar = () => {
 
-    const { logout } = useAuth0()
+    const { logout, user } = useAuth0()
 
     const classes = useStyles();
     return (
         <AppBar className={classes.root}>
             <Typography className={classes.title} variant='h1'>Traffic Surveillance</Typography>
-            <Button className={classes.button} onClick={() => logout({ returnTo: 'http://localhost:8081' })} variant='contained'>logout</Button>
+            <img src={user.picture} />
+            <p>{user.sub}</p>
+            <Button className={classes.button} onClick={() => logout({ returnTo: window.location.origin})} variant='contained'>logout</Button>
         </AppBar>          
     );
 }

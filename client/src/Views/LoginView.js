@@ -1,7 +1,8 @@
-import React from 'react'
-import { makeStyles } from '@material-ui/core/styles'
-import { Box, Typography, Paper } from '@material-ui/core'
-import LoginTopbar from '../Components/LoginTopbar.js'
+import React from 'react';
+import { useAuth0 } from '@auth0/auth0-react';
+import { makeStyles } from '@material-ui/core/styles';
+import { Box, Typography, Paper } from '@material-ui/core';
+import LoginTopbar from '../Components/LoginTopbar.js';
 
 /*
 Home page text and photo component
@@ -20,22 +21,26 @@ export default function LoginView() {
         wrapper: {
             display: "flex",
             justifyContent: "center"
-        }, 
+        },
         text: {
             marginTop: "20%"
         }
     });
 
+    const { isAuthenticated } = useAuth0();
+
     const classes = useStyles();
     return (
-        <Box className={classes.root}>
-            <LoginTopbar view='LoginView'/>
-            <Box className={classes.wrapper}>
-                <Typography className={classes.text} variant='h3' component='h2'>
-                    Please login using the button above to view the Traffic Surveillance system.
-                </Typography>
+        !isAuthenticated && (
+            <Box className={classes.root}>
+                <LoginTopbar view='LoginView' />
+                <Box className={classes.wrapper}>
+                    <Typography className={classes.text} variant='h3' component='h2'>
+                        Please login using the button above to view the Traffic Surveillance system.
+                    </Typography>
+                </Box>
             </Box>
-        </Box>
+        )
     );
 }
 
