@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useAuth0 } from '@auth0/auth0-react';
 import { Typography, AppBar, makeStyles, Button } from '@material-ui/core';
 
 /*
@@ -24,23 +25,26 @@ const useStyles = makeStyles({
     }
 });
 
-async function LoginLogout(view) {
+function LoginLogout(view) {
     if (view === "Login") {
         // const response = await fetch('http://localhost:8080/auth/login/auth0');
         // if (!response.ok) {
         //     alert('Error logging in. Please try again')
         // }
-        window.location.assign("http://localhost:8080/auth/login/auth0");
+        if (window.location.assign("http://localhost:8080/auth/login/auth0")) {
+            window.location.pathname = "/home"
+        }
+        
     } else {
-        const response = await fetch('http://localhost:8080/auth/logout');
-        if (!response.ok) {
-            alert('Error logging ypu out. Please try again')
+        if (window.location.assign("http://localhost:8080/auth/logout")) {
+            window.location.pathname = "/"
         }
     }
 }
 
-export default function Topbar(props) {
+const LoginTopbar = (props) => {
 
+    const { loginWithRedirect } = useAuth0()
     let header;
     let button;
 
@@ -56,7 +60,9 @@ export default function Topbar(props) {
     return (
         <AppBar className={classes.root}>
             <Typography className={classes.title} variant='h1'>{header}</Typography>
-            <Button className={classes.button} onClick={() => {LoginLogout(button)}} variant='contained'>{button}</Button>
+            <Button className={classes.button} onClick={() => loginWithRedirect()} variant='contained'>login</Button>
         </AppBar>          
     );
 }
+
+export default LoginTopbar;

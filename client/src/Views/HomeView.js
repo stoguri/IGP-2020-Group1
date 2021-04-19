@@ -2,7 +2,7 @@ import React from 'react'
 import { makeStyles } from '@material-ui/core/styles'
 import { Box, Typography, Paper, List, ListItem, Grid } from '@material-ui/core'
 import { DataGrid } from '@material-ui/data-grid';
-import Topbar from '../Components/Topbar.js'
+import LogoutTopbar from '../Components/LogoutTopbar.js'
 
 /*
 Home page text and photo component
@@ -59,7 +59,7 @@ export default function HomeView() {
     const classes = useStyles();
     return (
         <Box className={classes.root}>
-            <Topbar view="HomeView" />
+            <LogoutTopbar />
             <Grid container spacing={3} className={classes.grid}>
                 <Grid item xs={7}>
                     <Paper className={classes.largeVideo} elevation={10}>
