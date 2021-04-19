@@ -14,17 +14,12 @@ const config = require('./config.json');
 
 const app = express();
 
-app.use(cors())
+app.use(cors());
 
 const server = app.listen(config.network.port, () => {
     console.log(`Server running is ${config.operationMode} mode, listening on: ` +
         config.network.domain + ':' + config.network.port);
 });
-
-// app.all('/*', function(req, res, next) {
-//     res.header("Access-Control-Allow-Origin", "*");
-//     next();
-// });
 
 app.use('/', express.static('./client/', {'extensions': ['html']}));
 
@@ -40,26 +35,27 @@ const auth = require('./auth.js');
 app.use(passport.initialize());
 app.use(passport.session());
 
+// %%% authentication routes & functions %%%
+
 /**
  * Login using auth0 strategy
  */
-app.get('/auth/login/auth0', passport.authenticate('auth0', {
-        // define what user info is sent
-        scope: ['openid', 'profile'],
-    }), (req, res) => {
-        // handle authentication success/failure here
-        res.set(access-control-allow-origin)
-        res.redirect("/");
-    }
+ app.get('/auth/login/auth0', passport.authenticate('auth0', {
+    // define what user info is sent
+    scope: ['openid', 'profile'],
+}), (req, res) => {
+    // handle authentication success/failure here
+    res.set(access-control-allow-origin);
+    res.redirect("/");
+}
 );
 
 app.get('/auth/callback', passport.authenticate('auth0'), (req, res) => {
     req.session.user = req.user;
     req.session.auth = true;
-    res.redirect('/');
+    console.log(req.session.user.displayName + "authenticated, session id: " + req.sessionID);
+    res.status(301).redirect("http://localhost:8081");
 });
-
-// %%% authentication routes & functions %%%
 
 /**
  * @api {get} /auth/login/headless login for headless applications 
@@ -102,7 +98,7 @@ app.get('/auth/logout', (req, res) => {
  * @apiFailure {status} 401
  */
 app.get('/auth/check', (req, res) => {
-    console.log("got auth check request");
+    console.log("auth check, session id: " + req.sessionID);
     if(req.session.auth) {
         res.sendStatus(204);
     } else {

@@ -26,10 +26,11 @@ const useStyles = makeStyles({
 
 async function LoginLogout(view) {
     if (view === "Login") {
-        const response = await fetch('http://localhost:8080/auth/login/auth0');
-        if (!response.ok) {
-            alert('Error logging in. Please try again')
-        }
+        // const response = await fetch('http://localhost:8080/auth/login/auth0');
+        // if (!response.ok) {
+        //     alert('Error logging in. Please try again')
+        // }
+        window.location.assign("http://localhost:8080/auth/login/auth0");
     } else {
         const response = await fetch('http://localhost:8080/auth/logout');
         if (!response.ok) {
