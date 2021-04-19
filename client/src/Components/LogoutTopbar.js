@@ -11,17 +11,16 @@ const useStyles = makeStyles({
         backgroundColor: "darkslategrey",
         display: "flex",
         flexDirection: "row",
-        justifyContent: "center",
+        justifyContent: "space-between",
+        alignItems: 'center',
         height: '8vh'
     },
     title: {
-        position: 'fixed',
         fontSize: 'calc(1em + 3vw)'
     },
     button: {
         height: '40%',
-        marginTop: '1.5%',
-        marginLeft: '80%'
+        marginRight: '1vw'
     }
 });
 
@@ -32,9 +31,11 @@ const LogoutTopbar = () => {
     const classes = useStyles();
     return (
         <AppBar className={classes.root}>
+            <Typography>
+                {user.sub}<br />
+                {user.email}
+            </Typography>
             <Typography className={classes.title} variant='h1'>Traffic Surveillance</Typography>
-            <img src={user.picture} />
-            <p>{user.sub}</p>
             <Button className={classes.button} onClick={() => logout({ returnTo: window.location.origin})} variant='contained'>logout</Button>
         </AppBar>          
     );

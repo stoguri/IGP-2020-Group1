@@ -11,17 +11,17 @@ const useStyles = makeStyles({
         backgroundColor: "darkslategrey",
         display: "flex",
         flexDirection: "row",
-        justifyContent: "center",
+        justifyContent: "flex-end",
+        alignItems: 'center',
         height: '8vh'
     },
     title: {
-        position: 'fixed',
-        fontSize: 'calc(1em + 3vw)'
+        fontSize: 'calc(1em + 3vw)',
+        marginRight: '30vw'
     },
     button: {
         height: '40%',
-        marginTop: '1.5%',
-        marginLeft: '80%'
+        marginRight: '1vw'
     }
 });
 
