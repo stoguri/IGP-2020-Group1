@@ -27,7 +27,7 @@ Navigate into the repository and install the npm packages using the command:
 npm install
 ```
 
-Create the config.json file in the server directory.
+Create the config.json file in the /client/src/ directory.
 
 ## config.json structure
 ```json
