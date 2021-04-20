@@ -4,7 +4,7 @@ const passport = require('passport');
 const Auth0Strategy = require('passport-auth0');
 const crypto = require('crypto');
 
-const config = require('./config.json');
+const config = require('../client/src/config.json');
 let users_headless = require('./users.json').users_headless;
 
 if(config.operationMode == "test") {
@@ -27,7 +27,7 @@ passport.use(new Auth0Strategy(
         domain: config.auth.domain,
         clientID: config.auth.clientID,
         clientSecret: config.auth.clientSecret,
-        callbackURL: `http://${config.network.domain}:8080/auth/callback`
+        callbackURL: `${config.network.client.protocol}://${config.network.client.domain}:${config.network.client.port}/auth/callback`
     }, 
     (accessToken, refreshToken, extraParams, profile, done) => {
         return done(null, profile);

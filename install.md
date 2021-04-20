@@ -8,9 +8,8 @@ To set up user authentication go to <https://manage.auth0.com/>.
 
 1. Create a single page JavaScript web application.
 2. Go to application settings.
-3. Put "%YOURDOMAIN%:%YOURPORT%/auth/callback" in the "Allowed Callbacks URLs" box.
-4. Put "%YOURDOMAIN%:%YOURPORT%" in the "Allowed Logout URLs" box.
-6. Save changes.
+3. Put "%CLIENTPROTOCOL%://%CLIENTDOMAIN%:%CLIENTPORT%/auth/callback" in the "Allowed Callbacks URLs" box, for example "http://localhost:8081/auth/callback".
+4. Save changes.
 
 # Deploying the application
 
@@ -34,8 +33,16 @@ Create the config.json file in the server directory.
 ```json
 {
     "network": {
-        "domain": "{string} user defined",
-        "port": "{integer} user defined"
+            "server": {
+            "domain": "{string} user defined",
+            "port": "{integer} user defined",
+            "protocol": "{string} web protocol, user defined"
+        },
+        "client": {
+            "domain": "{string} user defined",
+            "port": "{integer} user defined",
+            "protocol": "{string} web protocol, user defined"
+        }
     },
     "auth": {
         "clientID": "{string} from auth0",
@@ -96,9 +103,10 @@ The application can be tested by using the command:
 npm test
 ```
 
-Run the application on the specified domain using the command: 
+Run the application using the commands: 
 ```bash
-npm start
+npm run start_server
+npm run start_client
 ```
 
 A message should appear in the console saying the address the server is running on.

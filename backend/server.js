@@ -5,10 +5,16 @@ const cors = require('cors');
 const session = require('express-session');
 const passport = require('passport');
 
-const config = require('./config.json');
+const config = require('../client/src/config.json');
 
 // verify some config information is correct
 // log output for user
+
+const address = config.network.server.protocol + '://' +
+    config.network.server.domain + ':' + config.network.server.port;
+
+// set server address as proxy
+require('../client/package.json').proxy = address;
 
 // %%% init server %%% 
 
@@ -16,9 +22,8 @@ const app = express();
 
 app.use(cors());
 
-const server = app.listen(config.network.port, () => {
-    console.log(`Server running is ${config.operationMode} mode, listening on: ` +
-        config.network.domain + ':' + config.network.port);
+app.listen(config.network.server.port, () => {
+    console.log(`Server running is ${config.operationMode} mode, listening on: ${address}`);
 });
 
 app.use('/', express.static('./client/', {'extensions': ['html']}));
@@ -54,7 +59,7 @@ app.get('/auth/callback', passport.authenticate('auth0'), (req, res) => {
     req.session.user = req.user;
     req.session.auth = true;
     console.log(req.session.user.displayName + "authenticated, session id: " + req.sessionID);
-    res.status(301).redirect("http://localhost:8081");
+    res.status(301).redirect(`${config.network.client.protocol}://${config.network.client.domain}:${config.network.client.port}`);
 });
 
 /**

@@ -1,16 +1,21 @@
 {
   "name": "trafficsurveillanceappgui",
   "version": "1.0.0",
+  "private": true,
   "description": "A web interface for a traffic surveillance application",
   "main": "server.js",
   "scripts": {
-    "test": "mocha --reporter spec",
-    "start": "node backend/server.js",
+    "start_server": "nodemon backend/server.js",
+    "start_client": "cd client && npm install && npm start",
+    "build_client": "cd client && npm run build",
+    "test": "mocha --reporter spec && cd client && npm test",
+    "test_server": "mocha --reporter spec",
+    "test_client": "cd client && npm test",
+    "eject": "cd client && npm run eject",
     "db_init": "node backend/db/init.js",
     "db_populate": "node backend/db/populate.js",
     "wavi_generate": "wavi ./ ./bin/graph.svg",
-    "apidoc_generate": "node ./apidocTest.js",
-    "build": "cd ../client && npm install && npm run build"
+    "apidoc_generate": "node ./apidocTest.js"
   },
   "repository": {
     "type": "git",

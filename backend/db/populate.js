@@ -2,7 +2,7 @@
 'use strict';
 
 const MongoClient = require('mongodb').MongoClient;
-const config = require('../config');
+const config = require('../../client/src/config.json');
 const testData = require('./testData');
 
 // connect to database

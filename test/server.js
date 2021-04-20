@@ -4,7 +4,7 @@
 const crypto = require('crypto');
 const session = require('supertest-session');
 
-const config = require('../backend/config.json');
+const config = require('../client/src/config.json');
 const app = require('../backend/server.js');
 
 const testData = require('../backend/db/testData.json');

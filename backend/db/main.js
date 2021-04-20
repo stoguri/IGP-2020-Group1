@@ -2,7 +2,7 @@
 'use strict';
 
 const MongoClient = require('mongodb').MongoClient;
-const config = require('../config.json');
+const config = require('../../client/src/config.json');
 
 // TODO export this to external
 const client = new MongoClient(`mongodb://${config.db.domain}:${config.db.port}`,
