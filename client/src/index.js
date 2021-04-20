@@ -7,13 +7,15 @@ import App from './App.js';
 import config from './config.json';
 
 const clientAddress = `${config.network.client.protocol}://${config.network.client.domain}:${config.network.client.port}`;
+const domain = `${config.auth.domain}`
+const clientid = `${config.auth.clientID}`
 
 // Render App component into the browser
 ReactDOM.render(
   <BrowserRouter>
     <Auth0Provider
-      domain='dev-1ica07er.eu.auth0.com'
-      clientId='WcaPsPE80oAYEvHyhHVnnQpzoiaTkeUF'
+      domain={domain}
+      clientId={clientid}
       redirectUri={clientAddress + '/home'}
     >
       <App/>
