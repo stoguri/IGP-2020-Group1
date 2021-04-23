@@ -2,7 +2,6 @@ import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { useAuth0 } from '@auth0/auth0-react';
 import { Box, Paper, List, ListItem, Grid } from '@material-ui/core';
-import LogoutTopbar from '../Components/LogoutTopbar.js';
 import Table from '../Components/Table';
 import VideoList from '../Components/VideoList';
 import MainVideo from '../Components/MainVideo.js';
