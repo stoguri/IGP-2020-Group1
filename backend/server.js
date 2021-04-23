@@ -2,6 +2,8 @@
 
 const express = require('express');
 const cors = require('cors');
+const jwt = require('express-jwt');
+const jwks = require('jwks-rsa');
 const session = require('express-session');
 const passport = require('passport');
 
@@ -17,7 +19,6 @@ const address = config.network.server.protocol + '://' +
 require('../client/package.json').proxy = address;
 
 // %%% init server %%% 
-
 const app = express();
 
 app.use(cors());
@@ -41,6 +42,24 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // %%% authentication routes & functions %%%
+
+/**
+ * ADMIN API ENTRY POINT
+ * Configuring API to accept RS256 signed tokens - permissions can be changed in auth0 dashboard under the API sections.
+ */
+ var jwtCheck = jwt({
+    secret: jwks.expressJwtSecret({
+        cache: true,
+        rateLimit: true,
+        jwksRequestsPerMinute: 5,
+        jwksUri: 'https://dev-1ica07er.eu.auth0.com/.well-known/jwks.json'
+  }),
+  audience: 'https://admin-api/',
+  issuer: 'https://dev-1ica07er.eu.auth0.com/',
+  algorithms: ['RS256']
+});
+
+app.use(jwtCheck);
 
 /**
  * Login using auth0 strategy
