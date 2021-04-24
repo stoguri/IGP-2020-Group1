@@ -4,6 +4,9 @@ const express = require('express');
 const cors = require('cors');
 const session = require('express-session');
 const https = require('https');
+const jwt = require('express-jwt');
+const jwtAuthz = require('express-jwt-authz');
+const jwksRsa = require('jwks-rsa');
 
 const auth = require('./auth.js');
 const db = require('./db/main.js');
@@ -39,6 +42,30 @@ app.use(session({
     resave: false,
     saveUninitialized: false
 }));
+
+// Authorization middleware. When used, the
+// Access Token must exist and be verified against
+// the Auth0 JSON Web Key Set
+const checkJwt = jwt({
+    // Dynamically provide a signing key
+    // based on the kid in the header and 
+    // the signing keys provided by the JWKS endpoint.
+    secret: jwksRsa.expressJwtSecret({
+      cache: true,
+      rateLimit: true,
+      jwksRequestsPerMinute: 5,
+      jwksUri: `${address}/.well-known/jwks.json`
+    }),
+  
+    // Validate the audience and the issuer.
+    audience: config.auth.api.identifier,
+    issuer: [config.auth.domain],
+    algorithms: ['RS256']
+});
+
+const checkScopes_basicAdmin = jwtAuthz(['read:vehicle']);
+const checkScopes_admin = jwtAuthz(['create:user', 'read:vehicle']);
+const checkScopes_writer = jwtAuthz(['create:vehicle']);
 
 /**
  * @api {get} /auth/login/headless login for headless applications 
@@ -91,7 +118,6 @@ app.get('/auth/check', (req, res) => {
 
 // %%% API routes and functions %%%
 
-
 /**
  * @api {post} /api/vehicle record new vehicle
  * @apiName GetUser
@@ -106,7 +132,7 @@ app.get('/auth/check', (req, res) => {
  * @apiSuccess {status} 202
  * @apiFailure {status} 401, 403, 500
  */
-app.post('/api/vehicle', async (req, res) => {
+app.post('/api/vehicle', checkJwt, checkScopes_writer, async (req, res) => {
     try {
         const status = await db.newVehicle(req.query.identifier, 
             req.query.entrance_id, parseFloat(req.query.entrance_time),
@@ -132,7 +158,7 @@ app.post('/api/vehicle', async (req, res) => {
  * @apiSuccess {json} details showing entrance, exit and route data
  * @apiFailure {status} 401, 403, 500
  */
-app.get('/api/vehicle', async (req, res) => {
+app.get('/api/vehicle', checkJwt, checkScopes_basicAdmin, async (req, res) => {
     try {
         const records = await db.getVehicles(req.query.entrance_id, parseFloat(req.query.entrance_time),
             req.query.exit_id, parseFloat(req.query.exit_time), req.query.inclusive);
