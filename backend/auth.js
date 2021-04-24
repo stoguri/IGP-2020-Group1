@@ -1,9 +1,6 @@
 'use strict';
 
-const passport = require('passport');
-const Auth0Strategy = require('passport-auth0');
 const crypto = require('crypto');
-
 const config = require('../client/src/config.json');
 let users_headless = require('./users.json').users_headless;
 
@@ -11,28 +8,6 @@ if(config.operationMode == "test") {
     const testData = require('./db/testData.json');
     users_headless = users_headless.concat(testData.users);
 }
-
-passport.serializeUser(function(user, done) {
-        done(null, user);
-    }
-);
-
-passport.deserializeUser(function(user, done) {
-        done(null, user);
-    }
-);
-
-passport.use(new Auth0Strategy(
-    {
-        domain: config.auth.domain,
-        clientID: config.auth.clientID,
-        clientSecret: config.auth.clientSecret,
-        callbackURL: `${config.network.client.protocol}://${config.network.client.domain}:${config.network.client.port}/auth/callback`
-    }, 
-    (accessToken, refreshToken, extraParams, profile, done) => {
-        return done(null, profile);
-    }
-));
 
 /**
  * Checks if authentication details given match an entry in headlessUsers.json

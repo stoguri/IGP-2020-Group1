@@ -3,8 +3,10 @@
 const express = require('express');
 const cors = require('cors');
 const session = require('express-session');
-const passport = require('passport');
+const https = require('https');
 
+const auth = require('./auth.js');
+const db = require('./db/main.js');
 const config = require('../client/src/config.json');
 
 // verify some config information is correct
@@ -16,14 +18,19 @@ const address = config.network.server.protocol + '://' +
 // set server address as proxy
 require('../client/package.json').proxy = address;
 
-// %%% init server %%% 
+// %%% init server %%%
 const app = express();
 
 app.use(cors());
 
-app.listen(config.network.server.port, () => {
-    console.log(`Server running is ${config.operationMode} mode, listening on: ${address}`);
-});
+if(config.network.server.protocol == 'http') {
+    app.listen(config.network.server.port, () => {
+        console.log(`Server running in ${config.operationMode} mode, listening on: ${address}`);
+    });
+} else if(config.network.server.protocol == 'https') {
+    https.createServer(app).listen(config.network.server.port);
+    console.log(`Server running in ${config.operationMode} mode, listening on: ${address}`);
+}
 
 app.use('/', express.static('./client/', {'extensions': ['html']}));
 
@@ -32,34 +39,6 @@ app.use(session({
     resave: false,
     saveUninitialized: false
 }));
-
-// %%% passport middleware %%%
-const auth = require('./auth.js');
-
-app.use(passport.initialize());
-app.use(passport.session());
-
-// %%% authentication routes & functions %%%
-
-/**
- * Login using auth0 strategy
- */
- app.get('/auth/login/auth0', passport.authenticate('auth0', {
-    // define what user info is sent
-    scope: ['openid', 'profile'],
-}), (req, res) => {
-    // handle authentication success/failure here
-    res.set(access-control-allow-origin);
-    res.redirect("/");
-}
-);
-
-app.get('/auth/callback', passport.authenticate('auth0'), (req, res) => {
-    req.session.user = req.user;
-    req.session.auth = true;
-    console.log(req.session.user.displayName + "authenticated, session id: " + req.sessionID);
-    res.status(301).redirect(`${config.network.client.protocol}://${config.network.client.domain}:${config.network.client.port}`);
-});
 
 /**
  * @api {get} /auth/login/headless login for headless applications 
@@ -110,14 +89,8 @@ app.get('/auth/check', (req, res) => {
     }
 });
 
-async function getPermissionLevel(req) {
-    return await db.getPermissionLevel(req.session.user.id.split("|")[1]);
-}
-
 // %%% API routes and functions %%%
 
-// DB functions
-const db = require('./db/main.js');
 
 /**
  * @api {post} /api/vehicle record new vehicle
@@ -134,15 +107,6 @@ const db = require('./db/main.js');
  * @apiFailure {status} 401, 403, 500
  */
 app.post('/api/vehicle', async (req, res) => {
-    if(!req.session.auth) {
-        res.sendStatus(401);
-        return;
-    }
-    if(!["writer"].includes(await getPermissionLevel(req))) {
-        res.sendStatus(403);
-        return;
-    }
-
     try {
         const status = await db.newVehicle(req.query.identifier, 
             req.query.entrance_id, parseFloat(req.query.entrance_time),
@@ -169,15 +133,6 @@ app.post('/api/vehicle', async (req, res) => {
  * @apiFailure {status} 401, 403, 500
  */
 app.get('/api/vehicle', async (req, res) => {
-    if(!req.session.auth) {
-        res.sendStatus(401);
-        return;
-    }
-    if(!["basic", "admin"].includes(await getPermissionLevel(req))) {
-        res.sendStatus(403);
-        return;
-    }
-
     try {
         const records = await db.getVehicles(req.query.entrance_id, parseFloat(req.query.entrance_time),
             req.query.exit_id, parseFloat(req.query.exit_time), req.query.inclusive);
