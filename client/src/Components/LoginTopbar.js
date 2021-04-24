@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 import { Typography, AppBar, makeStyles, Button } from '@material-ui/core';
 
@@ -25,9 +25,9 @@ const useStyles = makeStyles({
     }
 });
 
-const LoginTopbar = (props) => {
+const LoginTopbar = () => {
 
-    const { loginWithRedirect, logout } = useAuth0()
+    const { loginWithRedirect, logout, user, getAccessTokenSilently } = useAuth0()
 
     const killAuth0Sessions = () => {
         logout();
@@ -35,7 +35,7 @@ const LoginTopbar = (props) => {
     }
 
     const login = () => {
-        setTimeout(() => {loginWithRedirect()}, 100) // wait 100ms before calling login to ensure that auth0 has time to destroy access tokens
+        setTimeout(() => { loginWithRedirect() }, 50) // wait 100ms before calling login to ensure that auth0 has time to destroy access tokens
     }
 
     const classes = useStyles();
