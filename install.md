@@ -13,8 +13,8 @@ To set up user authentication go to <https://manage.auth0.com/>.
 5. Under the Applications tab open APIs and create a new API.
 6. Under permissions add the following permissions:
 * read:vehicle
-5. Open the Auth Pipeline tab and click on Rules.
-6. Create a new rule, select empty rule and enter this code:
+7. Open the Auth Pipeline tab and click on Rules.
+8. Create a new rule, select empty rule and enter this code:
 ```
 function emailDomainWhitelist(user, context, callback) {
 
