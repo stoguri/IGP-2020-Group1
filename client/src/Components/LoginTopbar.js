@@ -27,7 +27,7 @@ const useStyles = makeStyles({
 
 const LoginTopbar = () => {
 
-    const { loginWithRedirect, logout, user, getAccessTokenSilently } = useAuth0()
+    const { loginWithRedirect, logout } = useAuth0()
 
     const killAuth0Sessions = () => {
         logout();

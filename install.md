@@ -8,8 +8,43 @@ To set up user authentication go to <https://manage.auth0.com/>.
 
 1. Create a single page JavaScript web application.
 2. Go to application settings.
-3. Put "%CLIENTPROTOCOL%://%CLIENTDOMAIN%:%CLIENTPORT%/auth/callback" in the "Allowed Callbacks URLs" box, for example "http://localhost:8081/auth/callback".
+3. Put "%CLIENTPROTOCOL%://%CLIENTDOMAIN%:%CLIENTPORT%" in the "Allowed Callbacks URLs" box, for example "http://localhost:8081".
 4. Save changes.
+5. Under the Applications tab open APIs and create a new API.
+6. Under permissions add the following permissions:
+* read:vehicle
+5. Open the Auth Pipeline tab and click on Rules.
+6. Create a new rule, select empty rule and enter this code:
+```
+function emailDomainWhitelist(user, context, callback) {
+
+  // Access should only be granted to verified users.
+  if (!user.email || !user.email_verified) {
+    return callback(new UnauthorizedError('Access denied.'));
+  }
+	
+  //authorized user emails
+  const whitelist = [ 
+    'example@email.com',
+    'example2@email.com'
+  ]; 
+  
+  const userHasAccess = whitelist.some(
+      function (item) {
+        const email = user.email;
+        return email.toLowerCase() === item;
+      });
+
+  if (!userHasAccess) {
+    context.redirect = {
+    	url: "https://dev-1ica07er.eu.auth0.com/v2/logout?federated"
+  	};
+  } else {
+  	return callback(null, user, context);
+  }
+}
+```
+replacing the emails in whitelist with the emails you want to be allowed to access the site
 
 # Deploying the application
 
@@ -48,7 +83,10 @@ Create the config.json file in the /client/src/ directory.
         "clientID": "{string} from auth0",
         "clientSecret": "{string} from auth0",
         "domain": "{string} from auth0",
-        "encryptionMethod": "{string} user defined, must be supported by the version of OpenSSL on the platform. Eg. 'sha1', 'md5'." 
+        "api":{
+            "identifier": "https://IGP-Backend/"
+        },
+        "encryptionMethod": "{string} user defined, must be supported by the version of OpenSSL on the platform. Eg. 'sha1', 'md5'."
     },
     "db": {
         "domain": "{string} user defined",
@@ -58,6 +96,7 @@ Create the config.json file in the /client/src/ directory.
     "entrances": ["{[string]} list of entrance ids"],
     "operationMode": "{string} deployment, audit or test"
 }
+
 ```
 
 Create the users.json file in the server directory. Add Auth0 users and headless users to this json. Auth0 users are users that can authenticated with the graphical Auth0 strategy, this will be any end users. Headless users are users that cannot use the Auth0 strategy to login, the inference network should be one of these users.

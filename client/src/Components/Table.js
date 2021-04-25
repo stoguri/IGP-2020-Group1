@@ -22,23 +22,12 @@ const Table = () => {
         { field: 'dirIn', headerName: 'Direction In', flex: 0.45 },
         { field: 'dirOut', headerName: 'Direction Out', flex: 0.45 },
     ];
-
-    const rows = [
-        { id: '1', dirIn: 'Camera 2', dirOut: 'camera 4' },
-        { id: '2', dirIn: 'Camera 2', dirOut: 'camera 4' },
-        { id: '3', dirIn: 'Camera 2', dirOut: 'camera 4' },
-        { id: '4', dirIn: 'Camera 2', dirOut: 'camera 4' },
-        { id: '5', dirIn: 'Camera 2', dirOut: 'camera 4' },
-        { id: '6', dirIn: 'Camera 2', dirOut: 'camera 4' },
-        { id: '7', dirIn: 'Camera 2', dirOut: 'camera 4' },
-        { id: '8', dirIn: 'Camera 2', dirOut: 'camera 4' },
-    ];
-
+    
     const getVehicleDataSecurely = async () => {
         try {
             const token = await getAccessTokenSilently({
                 audience: config.auth.api.identifier,
-                scope: "read:vehicle create:vehicle"
+                scope: "read:vehicle"
             });
 
             const response = await fetch(

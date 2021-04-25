@@ -201,8 +201,6 @@ app.get('/api/vehicle', checkJwt, checkScopes_basicAdmin, async (req, res) => {
             ]
         }
 
-
-
         res.json(vehicleData);
     } catch (e) {
         console.error(e);
