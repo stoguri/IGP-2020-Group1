@@ -26,16 +26,16 @@ const app = express();
 
 app.use(cors());
 
-if(config.network.server.protocol == 'http') {
+if (config.network.server.protocol == 'http') {
     app.listen(config.network.server.port, () => {
         console.log(`Server running in ${config.operationMode} mode, listening on: ${address}`);
     });
-} else if(config.network.server.protocol == 'https') {
+} else if (config.network.server.protocol == 'https') {
     https.createServer(app).listen(config.network.server.port);
     console.log(`Server running in ${config.operationMode} mode, listening on: ${address}`);
 }
 
-app.use('/', express.static('./client/', {'extensions': ['html']}));
+app.use('/', express.static('./client/', { 'extensions': ['html'] }));
 
 app.use(session({
     secret: 'mySecret',
@@ -51,15 +51,15 @@ const checkJwt = jwt({
     // based on the kid in the header and 
     // the signing keys provided by the JWKS endpoint.
     secret: jwksRsa.expressJwtSecret({
-      cache: true,
-      rateLimit: true,
-      jwksRequestsPerMinute: 5,
-      jwksUri: `https://${config.auth.domain}/.well-known/jwks.json`
+        cache: true,
+        rateLimit: true,
+        jwksRequestsPerMinute: 5,
+        jwksUri: `https://${config.auth.domain}/.well-known/jwks.json`
     }),
-  
+
     // Validate the audience and the issuer.
     audience: config.auth.api.identifier,
-    issuer: [config.auth.domain],
+    issuer: [`https://${config.auth.domain}/`],
     algorithms: ['RS256']
 });
 
@@ -81,7 +81,7 @@ const checkScopes_writer = jwtAuthz(['create:vehicle']);
 app.get('/auth/login/headless', (req, res) => {
     const status = auth.headlessLogin(req.query.id, req.query.password);
 
-    if(status.toString()[0] == 2) {
+    if (status.toString()[0] == 2) {
         req.session.user = {
             "displayName": req.query.id,
             "id": `headless|${req.query.id}`
@@ -90,7 +90,7 @@ app.get('/auth/login/headless', (req, res) => {
         res.sendStatus(200);
     } else {
         res.sendStatus(status);
-    }    
+    }
 });
 
 app.get('/auth/logout', (req, res) => {
@@ -109,7 +109,7 @@ app.get('/auth/logout', (req, res) => {
  */
 app.get('/auth/check', (req, res) => {
     console.log("auth check, session id: " + req.sessionID);
-    if(req.session.auth) {
+    if (req.session.auth) {
         res.sendStatus(204);
     } else {
         res.sendStatus(401);
@@ -134,11 +134,11 @@ app.get('/auth/check', (req, res) => {
  */
 app.post('/api/vehicle', checkJwt, checkScopes_writer, async (req, res) => {
     try {
-        const status = await db.newVehicle(req.query.identifier, 
+        const status = await db.newVehicle(req.query.identifier,
             req.query.entrance_id, parseFloat(req.query.entrance_time),
             req.query.exit_id, req.query.exit_time);
         res.sendStatus(status);
-    } catch(e) {
+    } catch (e) {
         console.error(e);
         res.sendStatus(500);
     }
@@ -158,20 +158,20 @@ app.post('/api/vehicle', checkJwt, checkScopes_writer, async (req, res) => {
  * @apiSuccess {json} details showing entrance, exit and route data
  * @apiFailure {status} 401, 403, 500
  */
-app.get('/api/vehicle', checkJwt, async (req, res) => {
+app.get('/api/vehicle', checkJwt, checkScopes_basicAdmin, async (req, res) => {
     try {
         const records = await db.getVehicles(req.query.entrance_id, parseFloat(req.query.entrance_time),
             req.query.exit_id, parseFloat(req.query.exit_time), req.query.inclusive);
 
-        const details = {entrance: {}, exit: {}, route: {}};
+        const details = { entrance: {}, exit: {}, route: {} };
         // construct details array
         // load entrances from config
-        for(const entrance of config.entrances) {
+        for (const entrance of config.entrances) {
             details.entrance[entrance] = 0;
             details.exit[entrance] = 0;
             // routes
-            for(const e of config.entrances) {
-                if(entrance == e) {
+            for (const e of config.entrances) {
+                if (entrance == e) {
                     continue;
                 }
                 details.route[`${entrance}-${e}`] = 0;
@@ -179,24 +179,40 @@ app.get('/api/vehicle', checkJwt, async (req, res) => {
         }
 
         // derived fields
-        for(const record of records) {
+        for (const record of records) {
             details.entrance[record.entrance_id]++;
-            if(record.exit_id != null) {
+            if (record.exit_id != null) {
                 details.exit[record.exit_id]++;
                 details.route[`${record.entrance_id}-${record.exit_id}`]++;
             }
         }
 
-        res.json(details);
-    } catch(e) {   
+        // test data
+        const vehicleData = {
+            "data": [
+                { id: '1', dirIn: 'Camera 2', dirOut: 'camera 4' },
+                { id: '2', dirIn: 'Camera 2', dirOut: 'camera 4' },
+                { id: '3', dirIn: 'Camera 2', dirOut: 'camera 4' },
+                { id: '4', dirIn: 'Camera 2', dirOut: 'camera 4' },
+                { id: '5', dirIn: 'Camera 2', dirOut: 'camera 4' },
+                { id: '6', dirIn: 'Camera 2', dirOut: 'camera 4' },
+                { id: '7', dirIn: 'Camera 2', dirOut: 'camera 4' },
+                { id: '8', dirIn: 'Camera 2', dirOut: 'camera 4' },
+            ]
+        }
+
+
+
+        res.json(vehicleData);
+    } catch (e) {
         console.error(e);
         res.sendStatus(500);
     }
 });
 
-if(config.operationMode == "audit") {
+if (config.operationMode == "audit") {
     app.get('/api/vehicle', async (req, res) => {
-        
+
     })
 }
 

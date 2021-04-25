@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 import { makeStyles, Paper } from '@material-ui/core';
 import { DataGrid } from '@material-ui/data-grid';
@@ -12,6 +12,10 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const Table = () => {
+
+    const { getAccessTokenSilently } = useAuth0();
+    const serverUrl = `${config.network.server.protocol}://${config.network.server.domain}:${config.network.server.port}`;
+    const [vehicleData, setVehicleData] = useState([]);
 
     const columns = [
         { field: 'id', headerName: 'ID', flex: 0.1 },
@@ -30,17 +34,12 @@ const Table = () => {
         { id: '8', dirIn: 'Camera 2', dirOut: 'camera 4' },
     ];
 
-    const { getAccessTokenSilently } = useAuth0();
-    const serverUrl = `${config.network.server.protocol}://${config.network.server.domain}:${config.network.server.port}`;
-    let vehicleData;
     const getVehicleDataSecurely = async () => {
-        console.log('hit')
         try {
             const token = await getAccessTokenSilently({
-                audience: `${config.auth.api.identifier}`,
-                scope: "read:vehicle",
+                audience: config.auth.api.identifier,
+                scope: "read:vehicle create:vehicle"
             });
-            console.log(token);
 
             const response = await fetch(
                 `${serverUrl}/api/vehicle`,
@@ -51,9 +50,9 @@ const Table = () => {
                 }
             );
 
-            vehicleData = await response.json();
+            const data = await response.json();
 
-            console.log(JSON.stringify(vehicleData));
+            return data;
 
         } catch (error) {
             alert(error.message);
@@ -61,13 +60,18 @@ const Table = () => {
     };
 
     useEffect(async () => {
-        getVehicleDataSecurely();
+        const jsonData = await getVehicleDataSecurely();
+        let arrayData = [];
+        jsonData.data.forEach((vehicle) => {
+            arrayData.push(vehicle);
+        });
+        setVehicleData(arrayData);
     })
 
     const classes = useStyles();
     return (
         <Paper className={classes.root} elevation={10}>
-            <DataGrid id='datagrid' rows={rows} columns={columns} pageSize={10} />
+            <DataGrid id='datagrid' rows={vehicleData} columns={columns} pageSize={10} />
         </Paper>
     )
 }
