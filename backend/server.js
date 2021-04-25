@@ -54,7 +54,7 @@ const checkJwt = jwt({
       cache: true,
       rateLimit: true,
       jwksRequestsPerMinute: 5,
-      jwksUri: `${address}/.well-known/jwks.json`
+      jwksUri: `https://${config.auth.domain}/.well-known/jwks.json`
     }),
   
     // Validate the audience and the issuer.
@@ -158,7 +158,7 @@ app.post('/api/vehicle', checkJwt, checkScopes_writer, async (req, res) => {
  * @apiSuccess {json} details showing entrance, exit and route data
  * @apiFailure {status} 401, 403, 500
  */
-app.get('/api/vehicle', checkJwt, checkScopes_basicAdmin, async (req, res) => {
+app.get('/api/vehicle', checkJwt, async (req, res) => {
     try {
         const records = await db.getVehicles(req.query.entrance_id, parseFloat(req.query.entrance_time),
             req.query.exit_id, parseFloat(req.query.exit_time), req.query.inclusive);

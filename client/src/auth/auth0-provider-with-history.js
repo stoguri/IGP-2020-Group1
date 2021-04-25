@@ -8,7 +8,7 @@ const Auth0ProviderWithHistory = ({ children }) => {
 
   const domain = `${config.auth.domain}`;
   const clientId = `${config.auth.clientID}`;
-  const audience = `${config.auth.audience}`;
+  const audience = `${config.auth.api.identifier}`;
 
   const clientAddress = `${config.network.client.protocol}://${config.network.client.domain}:${config.network.client.port}`;
 
@@ -23,6 +23,7 @@ const Auth0ProviderWithHistory = ({ children }) => {
       redirectUri={window.location.origin}
       onRedirectCallback={onRedirectCallback}
       audience={audience}
+      scope="read:vehicle"
     >
       {children}
     </Auth0Provider>

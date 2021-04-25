@@ -1,9 +1,9 @@
-import React, {useEffect} from 'react';
+import React, { useEffect } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 import { makeStyles, Paper } from '@material-ui/core';
 import { DataGrid } from '@material-ui/data-grid';
 import config from '../config.json';
- 
+
 const useStyles = makeStyles((theme) => ({
     root: {
         marginRight: '2vw',
@@ -31,12 +31,16 @@ const Table = () => {
     ];
 
     const { getAccessTokenSilently } = useAuth0();
-    const serverUrl = `${config.network.server.protocol}://${config.network.server.domain}:${config.network.server.port}`; 
+    const serverUrl = `${config.network.server.protocol}://${config.network.server.domain}:${config.network.server.port}`;
     let vehicleData;
     const getVehicleDataSecurely = async () => {
         console.log('hit')
         try {
-            const token = await getAccessTokenSilently();
+            const token = await getAccessTokenSilently({
+                audience: `${config.auth.api.identifier}`,
+                scope: "read:vehicle",
+            });
+            console.log(token);
 
             const response = await fetch(
                 `${serverUrl}/api/vehicle`,
@@ -55,7 +59,7 @@ const Table = () => {
             alert(error.message);
         }
     };
-    
+
     useEffect(async () => {
         getVehicleDataSecurely();
     })
