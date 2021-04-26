@@ -18,6 +18,9 @@ const config = require('../client/src/config.json');
 const address = config.network.server.protocol + '://' +
     config.network.server.domain + ':' + config.network.server.port;
 
+const clientAddress = config.network.client.protocol + '://' +
+    config.network.client.domain + ':' + config.network.client.port;
+
 // set server address as proxy
 require('../client/package.json').proxy = address;
 
@@ -34,6 +37,8 @@ if (config.network.server.protocol == 'http') {
     https.createServer(app).listen(config.network.server.port);
     console.log(`Server running in ${config.operationMode} mode, listening on: ${address}`);
 }
+
+console.log(`Client application running in ${config.operationMode} mode, listening on: ${clientAddress}`);
 
 app.use('/', express.static('./client/', { 'extensions': ['html'] }));
 
