@@ -38,6 +38,7 @@
     "express-jwt-authz": "^2.4.1",
     "express-session": "^1.17.1",
     "https": "^1.0.0",
+    "jsonwebtoken": "^8.5.1",
     "jwks-rsa": "^2.0.3",
     "mocha": "^8.3.0",
     "mongodb": "^3.6.4",

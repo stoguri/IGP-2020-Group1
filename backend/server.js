@@ -2,11 +2,11 @@
 
 const express = require('express');
 const cors = require('cors');
-const session = require('express-session');
 const https = require('https');
 const jwt = require('express-jwt');
 const jwtAuthz = require('express-jwt-authz');
 const jwksRsa = require('jwks-rsa');
+const _jwt = require('jsonwebtoken');
 
 const auth = require('./auth.js');
 const db = require('./db/main.js');
@@ -42,12 +42,6 @@ console.log(`Client application running in ${config.operationMode} mode, listeni
 
 app.use('/', express.static('./client/', { 'extensions': ['html'] }));
 
-app.use(session({
-    secret: 'mySecret',
-    resave: false,
-    saveUninitialized: false
-}));
-
 // Authorization middleware. When used, the
 // Access Token must exist and be verified against
 // the Auth0 JSON Web Key Set
@@ -72,6 +66,33 @@ const checkScopes_basicAdmin = jwtAuthz(['read:vehicle']);
 const checkScopes_admin = jwtAuthz(['create:user', 'read:vehicle']);
 const checkScopes_writer = jwtAuthz(['create:vehicle']);
 
+// %%% CUSTOM AUTH %%%
+// using jwt
+const jwt_secret = config.auth.headlessSecret;
+
+function generateAccessToken(username) {
+    //return _jwt.sign(username, jwt_secret, {expiresIn: '1800s'});
+    return _jwt.sign(username, jwt_secret, {});
+}
+
+function authenticateToken(req, res, next) {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+
+    if(token == null) {
+        return res.sendStatus(401);
+    }
+
+    _jwt.verify(token, jwt_secret, (err, user) => {
+        console.log(err);
+        if(err) {
+            return res.sendStatus(403);
+        }
+        req.user = user;
+        next();
+    })
+}
+
 /**
  * @api {get} /auth/login/headless login for headless applications 
  * @apiName GetUser
@@ -86,13 +107,11 @@ const checkScopes_writer = jwtAuthz(['create:vehicle']);
 app.get('/auth/login/headless', (req, res) => {
     const status = auth.headlessLogin(req.query.id, req.query.password);
 
-    if (status.toString()[0] == 2) {
-        req.session.user = {
-            "displayName": req.query.id,
-            "id": `headless|${req.query.id}`
-        };
-        req.session.auth = true;
-        res.sendStatus(200);
+    if(status.toString()[0] == 2) {
+        // issue a token
+        const token = generateAccessToken(req.query.id);
+        console.log("headless login, token: " + token);
+        res.json(token);
     } else {
         res.sendStatus(status);
     }
@@ -102,23 +121,6 @@ app.get('/auth/logout', (req, res) => {
     req.session.destroy(function (err) {
         res.end();
     });
-});
-
-/**
- * @api {get} /auth/check check if the user has an authenticated session
- * @apiName GetUser
- * @apiGroup User
- *
- * @apiSuccess {status} 204
- * @apiFailure {status} 401
- */
-app.get('/auth/check', (req, res) => {
-    console.log("auth check, session id: " + req.sessionID);
-    if (req.session.auth) {
-        res.sendStatus(204);
-    } else {
-        res.sendStatus(401);
-    }
 });
 
 // %%% API routes and functions %%%
@@ -137,7 +139,7 @@ app.get('/auth/check', (req, res) => {
  * @apiSuccess {status} 202
  * @apiFailure {status} 401, 403, 500
  */
-app.post('/api/vehicle', checkJwt, checkScopes_writer, async (req, res) => {
+app.post('/api/vehicle', authenticateToken, async (req, res) => {
     try {
         const status = await db.newVehicle(req.query.identifier,
             req.query.entrance_id, parseFloat(req.query.entrance_time),
