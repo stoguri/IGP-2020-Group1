@@ -14,7 +14,8 @@ const useStyles = makeStyles((theme) => ({
 const Table = () => {
 
     const { getAccessTokenSilently } = useAuth0();
-    const serverUrl = `${config.network.server.protocol}://${config.network.server.domain}:${config.network.server.port}`;
+    const serverUrl = `https://${config.network.server.domain}:${config.network.server.https.port}`;
+    //const serverUrl = `http://${config.network.server.domain}:${config.network.server.http_port}`;
     const [vehicleData, setVehicleData] = useState([]);
 
     const columns = [

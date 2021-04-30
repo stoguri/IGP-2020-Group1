@@ -23,7 +23,8 @@ To set up and deploy this application you must have some information available t
 
 * A domain (%DOMAIN%, %PROTOCOL%), running on HTTPS for deployment, HTTP can be used for testing.
 * A client port (%CLIENTPORT%).
-* A server port (%SERVERPORT%).
+* An HTTP server port (%SERVERHTTPPORT%).
+* Optional - an HTTPS server port (%SERVERHTTPSPORT%).
 * A MongoDB port (%DBPORT%).
 
 # Setting up Auth0 authentication
@@ -34,8 +35,8 @@ To set up user authentication go to <https://manage.auth0.com/>.
     i. Domain (%APPLICATIONDOMAIN%).
     ii. Client ID (%CLIENTID%)
     iii. Client Secret (%CLIENTSECRET%).
-3. Put "%PROTOCOL%://%DOMAIN%:%CLIENTPORT%" in the "Allowed Callbacks URLs" box, for example "http://localhost:8081".
-4. Put "%PROTOCOL%://%DOMAIN%:%CLIENTPORT%" in the "Allowed Logout URLs" box.
+3. Put "%PROTOCOL%://%DOMAIN%:%CLIENTPORT%", or "%PROTOCOL%://%DOMAIN% if the port is 80 - in the "Allowed Callbacks URLs" box. For example "http://localhost:8081".
+4. Put "%PROTOCOL%://%DOMAIN%:%CLIENTPORT%", or "%PROTOCOL%://%DOMAIN% if the port is 80 - in the "Allowed Logout URLs" box.
 5. Save changes.
 6. Under the Applications tab open APIs and create a new API, the name of the API is not used in the application, however the identifer will be. Some information here will be used later.
     i. Identifier (%APIIDENTIFIER%).
@@ -131,8 +132,13 @@ Create the config.json file in the /client/src/ directory.
     "network": {
         "server": {
             "domain": "{string} user defined, %DOMAIN%",
-            "port": "{integer} user defined, %SERVERPORT%",
-            "protocol": "{string} web protocol, user defined, %PROTOCOL%"
+            "http_port": "{integer} user defined, %SERVERHTTPPORT%",
+            "https": {
+                "port": "{integer} user defined, %SERVERHTTPSPORT%",
+                "certificate": "{string} absolute path to cert",
+                "key": "{string} absolute path to privkey",
+                "ca": "{string} absolute path to chain"
+            }
         },
         "client": {
             "domain": "{string} user defined, %DOMAIN%",

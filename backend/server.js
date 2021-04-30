@@ -2,6 +2,8 @@
 
 const express = require('express');
 const cors = require('cors');
+const fs = require('fs');
+const http = require('http');
 const https = require('https');
 const jwt = require('express-jwt');
 const jwtAuthz = require('express-jwt-authz');
@@ -15,30 +17,31 @@ const config = require('../client/src/config.json');
 // verify some config information is correct
 // log output for user
 
-const address = config.network.server.protocol + '://' +
-    config.network.server.domain + ':' + config.network.server.port;
-
-const clientAddress = config.network.client.protocol + '://' +
-    config.network.client.domain + ':' + config.network.client.port;
-
 // set server address as proxy
-require('../client/package.json').proxy = address;
+require('../client/package.json').proxy = `https://${config.network.server.domain}:${config.network.server.https.port}`;
 
 // %%% init server %%%
 const app = express();
 
 app.use(cors());
 
-if (config.network.server.protocol == 'http') {
-    app.listen(config.network.server.port, () => {
-        console.log(`Server running in ${config.operationMode} mode, listening on: ${address}`);
-    });
-} else if (config.network.server.protocol == 'https') {
-    https.createServer(app).listen(config.network.server.port);
-    console.log(`Server running in ${config.operationMode} mode, listening on: ${address}`);
+// http server
+const httpServer = http.createServer(app);
+httpServer.listen(config.network.server.http_port);
+console.log(`HTTP server running in ${config.operationMode} mode, listening on: ` + 
+    `http://${config.network.server.domain}:${config.network.server.http_port}`);
+// https server
+if(config.network.server.https) {
+    const credentials = {
+        key: fs.readFileSync(config.network.server.https.key, 'utf8'),
+        cert: fs.readFileSync(config.network.server.https.certificate, 'utf8'),
+        ca: fs.readFileSync(config.network.server.https.ca, 'utf8')
+    }
+    const httpsServer = https.createServer(credentials, app);
+    httpsServer.listen(config.network.server.https.port);
+    console.log(`HTTPS server running in ${config.operationMode} mode, listening on: ` + 
+        `https://${config.network.server.domain}:${config.network.server.https.port}`);
 }
-
-console.log(`Client application running in ${config.operationMode} mode, listening on: ${clientAddress}`);
 
 app.use('/', express.static('./client/', { 'extensions': ['html'] }));
 
@@ -141,7 +144,7 @@ app.get('/auth/logout', (req, res) => {
  */
 app.post('/api/vehicle', authenticateToken, async (req, res) => {
     try {
-        const status = await db.newVehicle(req.query.identifier,
+        const status = await db.newVehicle(req.query.identifier, 
             req.query.entrance_id, parseFloat(req.query.entrance_time),
             req.query.exit_id, req.query.exit_time);
         res.sendStatus(status);

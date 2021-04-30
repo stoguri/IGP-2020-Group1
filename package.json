@@ -6,8 +6,8 @@
   "main": "server.js",
   "scripts": {
     "start_server": "nodemon backend/server.js",
-    "start_client": "cd client && npm install && npm start",
-    "build_client": "cd client && npm run build",
+    "start_client": "cd client && set PORT=80 && npm install && npm start",
+    "build_client": "cd client && set PORT=80 && npm run build",
     "test": "mocha --reporter spec && cd client && npm test",
     "test_server": "mocha --reporter spec",
     "test_client": "cd client && npm test",
