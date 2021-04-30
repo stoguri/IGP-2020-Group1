@@ -5,9 +5,10 @@
   "description": "A web interface for a traffic surveillance application",
   "main": "server.js",
   "scripts": {
+    "setup": "node setup.js && npm install && cd client && npm install",
     "start_server": "nodemon backend/server.js",
-    "start_client": "cd client && set PORT=80 && npm install && npm start",
-    "build_client": "cd client && set PORT=80 && npm run build",
+    "start_client": "cd client && npm start",
+    "build_client": "cd client && npm run build",
     "test": "mocha --reporter spec && cd client && npm test",
     "test_server": "mocha --reporter spec",
     "test_client": "cd client && npm test",

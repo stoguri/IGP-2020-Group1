@@ -119,9 +119,9 @@ Or you can clone the repository using the command:
 git clone https://github.com/stoguri/IGP-2020-Group1
 ```
 
-Navigate into the repository and install the npm packages using the command:
+Navigate into the repository and run the setup script using the command:
 ```bash
-npm install
+npm run setup
 ```
 
 Create the config.json file in the /client/src/ directory.

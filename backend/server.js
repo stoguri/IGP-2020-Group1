@@ -1,5 +1,6 @@
 'use strict';
 
+// npm modules
 const express = require('express');
 const cors = require('cors');
 const fs = require('fs');
@@ -9,16 +10,12 @@ const jwt = require('express-jwt');
 const jwtAuthz = require('express-jwt-authz');
 const jwksRsa = require('jwks-rsa');
 const _jwt = require('jsonwebtoken');
-
+// our modules
 const auth = require('./auth.js');
 const db = require('./db/main.js');
+
 const config = require('../client/src/config.json');
-
-// verify some config information is correct
-// log output for user
-
-// set server address as proxy
-require('../client/package.json').proxy = `https://${config.network.server.domain}:${config.network.server.https.port}`;
+// validate config.json
 
 // %%% init server %%%
 const app = express();
@@ -197,21 +194,7 @@ app.get('/api/vehicle', checkJwt, checkScopes_basicAdmin, async (req, res) => {
             }
         }
 
-        // test data
-        const vehicleData = {
-            "data": [
-                { id: '1', dirIn: 'Camera 2', dirOut: 'camera 4' },
-                { id: '2', dirIn: 'Camera 2', dirOut: 'camera 4' },
-                { id: '3', dirIn: 'Camera 2', dirOut: 'camera 4' },
-                { id: '4', dirIn: 'Camera 2', dirOut: 'camera 4' },
-                { id: '5', dirIn: 'Camera 2', dirOut: 'camera 4' },
-                { id: '6', dirIn: 'Camera 2', dirOut: 'camera 4' },
-                { id: '7', dirIn: 'Camera 2', dirOut: 'camera 4' },
-                { id: '8', dirIn: 'Camera 2', dirOut: 'camera 4' },
-            ]
-        }
-
-        res.json(vehicleData);
+        res.json(details);
     } catch (e) {
         console.error(e);
         res.sendStatus(500);
