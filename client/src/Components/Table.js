@@ -11,7 +11,7 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const Table = () => {
+const Table = (props) => {
 
     const { getAccessTokenSilently } = useAuth0();
     //const serverUrl = `https://${config.network.server.domain}:${config.network.server.https.port}`;
@@ -57,13 +57,30 @@ const Table = () => {
             const ents = jsonData.entrance;
             const dLen = Object.keys(ents).length;
             for (let i = 0; i < dLen; i++) {
-                const row = {id: i+1, dirIn: jsonData.entrance[i], dirOut: jsonData.exit[i], route: jsonData.route[i]}
+                const row = { id: i + 1, dirIn: jsonData.entrance[i], dirOut: jsonData.exit[i], route: jsonData.route[i] }
                 arrayData.push(row);
             }
             setVehicleData(arrayData);
         }
-        fetchAndSetData();
-    },[])
+
+        fetchAndSetData()
+    }, [])
+
+    useEffect(() => {
+        async function fetchAndSetData() {
+            const jsonData = await getVehicleDataSecurely();
+            let arrayData = [];
+            const ents = jsonData.entrance;
+            const dLen = Object.keys(ents).length;
+            for (let i = 0; i < dLen; i++) {
+                const row = { id: i + 1, dirIn: jsonData.entrance[i], dirOut: jsonData.exit[i], route: jsonData.route[i] }
+                arrayData.push(row);
+            }
+            setVehicleData(arrayData);
+        }
+        fetchAndSetData()
+        console.log(vehicleData);
+    }, [props.camera])
 
     const classes = useStyles();
     return (
