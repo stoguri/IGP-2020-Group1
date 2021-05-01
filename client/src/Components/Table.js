@@ -57,14 +57,13 @@ const Table = () => {
             const ents = jsonData.entrance;
             const dLen = Object.keys(ents).length;
             for (let i = 0; i < dLen; i++) {
-                const row = {id: i, dirIn: jsonData.entrance[i], dirOut: jsonData.exit[i], route: jsonData.route[i]}
+                const row = {id: i+1, dirIn: jsonData.entrance[i], dirOut: jsonData.exit[i], route: jsonData.route[i]}
                 arrayData.push(row);
             }
             setVehicleData(arrayData);
         }
-        
         fetchAndSetData();
-    })
+    },[])
 
     const classes = useStyles();
     return (
