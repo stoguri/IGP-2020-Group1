@@ -14,16 +14,17 @@ const useStyles = makeStyles((theme) => ({
 const Table = () => {
 
     const { getAccessTokenSilently } = useAuth0();
-    const serverUrl = `https://${config.network.server.domain}:${config.network.server.https.port}`;
-    //const serverUrl = `http://${config.network.server.domain}:${config.network.server.http_port}`;
+    //const serverUrl = `https://${config.network.server.domain}:${config.network.server.https.port}`;
+    const serverUrl = `http://${config.network.server.domain}:${config.network.server.http_port}`;
     const [vehicleData, setVehicleData] = useState([]);
 
     const columns = [
         { field: 'id', headerName: 'ID', flex: 0.1 },
-        { field: 'dirIn', headerName: 'Direction In', flex: 0.45 },
-        { field: 'dirOut', headerName: 'Direction Out', flex: 0.45 },
+        { field: 'dirIn', headerName: 'Direction In', flex: 0.3 },
+        { field: 'dirOut', headerName: 'Direction Out', flex: 0.3 },
+        { field: 'route', headerName: 'Route taken', flex: 0.3 }
     ];
-    
+
     const getVehicleDataSecurely = async () => {
         try {
             const token = await getAccessTokenSilently({
@@ -49,13 +50,20 @@ const Table = () => {
         }
     };
 
-    useEffect(async () => {
-        const jsonData = await getVehicleDataSecurely();
-        let arrayData = [];
-        jsonData.data.forEach((vehicle) => {
-            arrayData.push(vehicle);
-        });
-        setVehicleData(arrayData);
+    useEffect(() => {
+        async function fetchAndSetData() {
+            const jsonData = await getVehicleDataSecurely();
+            let arrayData = [];
+            const ents = jsonData.entrance;
+            const dLen = Object.keys(ents).length;
+            for (let i = 0; i < dLen; i++) {
+                const row = {id: i, dirIn: jsonData.entrance[i], dirOut: jsonData.exit[i], route: jsonData.route[i]}
+                arrayData.push(row);
+            }
+            setVehicleData(arrayData);
+        }
+        
+        fetchAndSetData();
     })
 
     const classes = useStyles();

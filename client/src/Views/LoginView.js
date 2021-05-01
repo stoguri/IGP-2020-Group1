@@ -1,7 +1,7 @@
 import React from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 import { makeStyles } from '@material-ui/core/styles';
-import { Box, Typography, Paper } from '@material-ui/core';
+import { Box, Typography } from '@material-ui/core';
 import LoginTopbar from '../Components/LoginTopbar.js';
 
 /*
