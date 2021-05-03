@@ -70,26 +70,27 @@ module.exports.getVehicles = async function(entrance_id, entrance_time, exit_id,
 
         // construct query
         const query = {};
-        if(entrance_id) {
-            query.entrance_id = entrance_id;
-        }
-        if(exit_id) {
-            query.exit_id = exit_id;
-        }
-        if(entrance_time) {
-            if(inclusive == 'true') {
-                query.entrance_time = {$gte: entrance_time};
-            } else {
-                query.entrance_time = {$lte: entrance_time};
-            }
-        }
-        if(exit_time) {
-            if(inclusive == 'true') {
-                query.exit_time = {$lte: exit_time};
-            } else {
-                query.exit_time = {$gte: exit_time};
-            }
-        }
+        query.entrance_id = entrance_id;
+        // if(entrance_id) {
+        //     query.entrance_id = entrance_id;
+        // }
+        // if(exit_id) {
+        //     query.exit_id = exit_id;
+        // }
+        // if(entrance_time) {
+        //     if(inclusive == 'true') {
+        //         query.entrance_time = {$gte: entrance_time};
+        //     } else {
+        //         query.entrance_time = {$lte: entrance_time};
+        //     }
+        // }
+        // if(exit_time) {
+        //     if(inclusive == 'true') {
+        //         query.exit_time = {$lte: exit_time};
+        //     } else {
+        //         query.exit_time = {$gte: exit_time};
+        //     }
+        // }
 
         // make query
         return await collection.find(query).toArray();

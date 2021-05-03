@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { useAuth0 } from '@auth0/auth0-react';
-import { Box, Grid, List, ListItem, Paper } from '@material-ui/core';
+import { Box, Card, CardHeader, CardMedia, Grid, List, ListItem, Paper } from '@material-ui/core';
 import LogoutTopbar from '../Components/LogoutTopbar';
 import Table from '../Components/Table';
 
@@ -37,31 +37,28 @@ const useStyles = makeStyles((theme) => ({
 export default function HomeView() {
 
     const { isAuthenticated } = useAuth0();
-    const [videoList, setVideoList] = useState([]);
+    const [videoList, setVideoList] = useState(["id0", "id1", "id2", "id3", "id4"]);
+    const date = new Date;
 
     // Entrance numbers/id must be defined
     const handleVideoClicks = (props) => {
         const currentOrder = videoList;
         const currentMain = videoList[0];
-        if (props == '2') {
+        if (props === '2') {
             currentOrder[0] = currentOrder[1];
             currentOrder[1] = currentMain;
-        } else if (props == '3') {
+        } else if (props === '3') {
             currentOrder[0] = currentOrder[2];
             currentOrder[2] = currentMain;
-        } else if (props == '4') {
+        } else if (props === '4') {
             currentOrder[0] = currentOrder[3];
             currentOrder[3] = currentMain;
-        } else if (props == '5') {
+        } else if (props === '5') {
             currentOrder[0] = currentOrder[4];
             currentOrder[4] = currentMain;
         }
         setVideoList([...currentOrder]);
     }
-
-    useEffect(() => {
-        setVideoList(["CAMERA-1", "CAMERA-2", "CAMERA-3", "CAMERA-4", "CAMERA-5"]);
-    }, [])
 
     const classes = useStyles();
     return (
@@ -70,9 +67,15 @@ export default function HomeView() {
                 <LogoutTopbar view="HomeView" />
                 <Grid container spacing={3} className={classes.grid}>
                     <Grid item xs={7}>
-                        <Paper className={classes.mainVideo} elevation={10}>
-                            {videoList[0]}
-                        </Paper>
+                        <Card className={classes.mainVideo} elevation={10}>
+                            <CardHeader
+                                title={videoList[0]}
+                                subheader={"started viewing at: " + date.getHours() + ":" + date.getMinutes()}
+                            />
+                            <CardMedia
+
+                            />
+                        </Card>
                     </Grid>
                     <Grid item xs={5}>
                         <Table camera={videoList[0]}/>

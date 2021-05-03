@@ -167,31 +167,44 @@ app.post('/api/vehicle', authenticateToken, async (req, res) => {
  */
 app.get('/api/vehicle', checkJwt, checkScopes_basicAdmin, async (req, res) => {
     try {
+        console.log(req.originalUrl);
+
         const records = await db.getVehicles(req.query.entrance_id, parseFloat(req.query.entrance_time),
             req.query.exit_id, parseFloat(req.query.exit_time), req.query.inclusive);
 
-        const details = { entrance: {}, exit: {}, route: {} };
+        //console.log(records);
+
+
+        const details = { time: {}, exit: {}, route: {} };
+
         // construct details array
         // load entrances from config
-        for (const entrance of config.entrances) {
-            details.entrance[entrance] = 0;
-            details.exit[entrance] = 0;
-            // routes
-            for (const e of config.entrances) {
-                if (entrance == e) {
-                    continue;
-                }
-                details.route[`${entrance}-${e}`] = 0;
-            }
-        }
+        // for (const entrance of config.entrances) {
+        //     details.entrance[entrance] = 0;
+        //     details.exit[entrance] = 0;
+        //     // routes
+        //     for (const e of config.entrances) {
+        //         if (entrance == e) {
+        //             continue;
+        //         }
+        //         details.route[`${entrance}-${e}`] = 0;
+        //     }
+        // }
 
-        // derived fields
-        for (const record of records) {
-            details.entrance[record.entrance_id]++;
-            if (record.exit_id != null) {
-                details.exit[record.exit_id]++;
-                details.route[`${record.entrance_id}-${record.exit_id}`]++;
-            }
+        // // derived fields
+        // for (const record of records) {
+        //     details.entrance[record.entrance_id]++;
+        //     if (record.exit_id != null) {
+        //         details.exit[record.exit_id]++;
+        //         details.route[`${record.entrance_id}-${record.exit_id}`]++;
+        //     }
+        // }
+
+        for (let i = 0; i < records.length; i++) {
+            console.log(records[i]);
+            details.time[i] = records[i].entrance_time;
+            details.exit[i] = records[i].exit_id;
+            details.route[i] = `${records[i].entrance_id} -> ${records[i].exit_id}`;
         }
 
         res.json(details);

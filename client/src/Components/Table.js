@@ -20,20 +20,23 @@ const Table = (props) => {
 
     const columns = [
         { field: 'id', headerName: 'ID', flex: 0.1 },
-        { field: 'dirIn', headerName: 'Direction In', flex: 0.3 },
+        { field: 'time', headerName: 'Entrance Time', flex: 0.3 },
         { field: 'dirOut', headerName: 'Direction Out', flex: 0.3 },
         { field: 'route', headerName: 'Route taken', flex: 0.3 }
     ];
 
-    const getVehicleDataSecurely = async () => {
+    async function getVehicleDataSecurely(camera) {
         try {
             const token = await getAccessTokenSilently({
                 audience: config.auth.api.identifier,
                 scope: "read:vehicle"
             });
-
+            const d = new Date();
+            const ent_time = d.getTime();
+            const req_path = `${serverUrl}/api/vehicle?entrance_id=${props.camera}&entrance_time=${ent_time}`;
+            console.log(req_path);
             const response = await fetch(
-                `${serverUrl}/api/vehicle`,
+                req_path,
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,
@@ -50,30 +53,30 @@ const Table = (props) => {
         }
     };
 
+
     useEffect(() => {
         async function fetchAndSetData() {
-            const jsonData = await getVehicleDataSecurely();
+            const jsonData = await getVehicleDataSecurely('CAMERA-1');
             let arrayData = [];
-            const ents = jsonData.entrance;
+            const ents = jsonData.time;
             const dLen = Object.keys(ents).length;
             for (let i = 0; i < dLen; i++) {
-                const row = { id: i + 1, dirIn: jsonData.entrance[i], dirOut: jsonData.exit[i], route: jsonData.route[i] }
+                const row = { id: i + 1, time: jsonData.time[i], dirOut: jsonData.exit[i], route: jsonData.route[i] }
                 arrayData.push(row);
             }
             setVehicleData(arrayData);
         }
-
         fetchAndSetData()
     }, [])
 
     useEffect(() => {
         async function fetchAndSetData() {
-            const jsonData = await getVehicleDataSecurely();
+            const jsonData = await getVehicleDataSecurely(props.camera);
             let arrayData = [];
-            const ents = jsonData.entrance;
+            const ents = jsonData.time;
             const dLen = Object.keys(ents).length;
             for (let i = 0; i < dLen; i++) {
-                const row = { id: i + 1, dirIn: jsonData.entrance[i], dirOut: jsonData.exit[i], route: jsonData.route[i] }
+                const row = { id: i + 1, time: jsonData.time[i], dirOut: jsonData.exit[i], route: jsonData.route[i] }
                 arrayData.push(row);
             }
             setVehicleData(arrayData);
