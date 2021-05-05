@@ -24,9 +24,10 @@ app.use(cors());
 
 // http server
 const httpServer = http.createServer(app);
-httpServer.listen(config.network.server.http_port);
-console.log(`HTTP server running in ${config.operationMode} mode, listening on: ` + 
-    `http://${config.network.server.domain}:${config.network.server.http_port}`);
+httpServer.listen(config.network.server.http_port, () => {
+    console.log(`HTTP server running in ${config.operationMode} mode, listening on: ` + 
+        `http://${config.network.server.domain}:${config.network.server.http_port}`);
+});
 // https server
 if(config.network.server.https) {
     const credentials = {
@@ -35,9 +36,10 @@ if(config.network.server.https) {
         ca: fs.readFileSync(config.network.server.https.ca, 'utf8')
     }
     const httpsServer = https.createServer(credentials, app);
-    httpsServer.listen(config.network.server.https.port);
-    console.log(`HTTPS server running in ${config.operationMode} mode, listening on: ` + 
-        `https://${config.network.server.domain}:${config.network.server.https.port}`);
+    httpsServer.listen(config.network.server.https.port, () => {
+        console.log(`HTTPS server running in ${config.operationMode} mode, listening on: ` + 
+            `https://${config.network.server.domain}:${config.network.server.https.port}`);
+    });
 }
 
 app.use('/', express.static('./client/', { 'extensions': ['html'] }));

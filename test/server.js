@@ -5,9 +5,9 @@ const crypto = require('crypto');
 const session = require('supertest-session');
 
 const config = require('../client/src/config.json');
-const app = require('../backend/server.js');
+const app = require('../server/server.js');
 
-const testData = require('../backend/db/testData.json');
+const testData = require('../server/db/testData.json');
 
 const writer = testData.users[0];
 const admin = testData.users[1];
