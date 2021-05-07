@@ -9,9 +9,7 @@ const https = require('https');
 const jwt = require('express-jwt');
 const jwtAuthz = require('express-jwt-authz');
 const jwksRsa = require('jwks-rsa');
-const _jwt = require('jsonwebtoken');
 // our modules
-const auth = require('./auth.js');
 const db = require('./db/main.js');
 
 const config = require('../client/src/config.json');
@@ -69,63 +67,6 @@ const checkScopes_basicAdmin = jwtAuthz(['read:vehicle']);
 const checkScopes_admin = jwtAuthz(['create:user', 'read:vehicle']);
 const checkScopes_writer = jwtAuthz(['create:vehicle']);
 
-// %%% CUSTOM AUTH %%%
-// using jwt
-const jwt_secret = config.auth.headlessSecret;
-
-function generateAccessToken(username) {
-    //return _jwt.sign(username, jwt_secret, {expiresIn: '1800s'});
-    return _jwt.sign(username, jwt_secret, {});
-}
-
-function authenticateToken(req, res, next) {
-    const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1];
-
-    if(token == null) {
-        return res.sendStatus(401);
-    }
-
-    _jwt.verify(token, jwt_secret, (err, user) => {
-        console.log(err);
-        if(err) {
-            return res.sendStatus(403);
-        }
-        req.user = user;
-        next();
-    })
-}
-
-/**
- * @api {get} /auth/login/headless login for headless applications 
- * @apiName GetUser
- * @apiGroup User
- *
- * @apiParam {string} username
- * @apiParam {string} encrypted password
- *
- * @apiSuccess {status} 200
- * @apiFailure {status} 401, 404
- */
-app.get('/auth/login/headless', (req, res) => {
-    const status = auth.headlessLogin(req.query.id, req.query.password);
-
-    if(status.toString()[0] == 2) {
-        // issue a token
-        const token = generateAccessToken(req.query.id);
-        console.log("headless login, token: " + token);
-        res.json(token);
-    } else {
-        res.sendStatus(status);
-    }
-});
-
-app.get('/auth/logout', (req, res) => {
-    req.session.destroy(function (err) {
-        res.end();
-    });
-});
-
 // %%% API routes and functions %%%
 
 /**
@@ -142,8 +83,9 @@ app.get('/auth/logout', (req, res) => {
  * @apiSuccess {status} 202
  * @apiFailure {status} 401, 403, 500
  */
-app.post('/api/vehicle', authenticateToken, async (req, res) => {
+app.post('/api/vehicle', checkJwt, checkScopes_writer, async (req, res) => {
     try {
+        console.log(req.query);
         const status = await db.newVehicle(req.query.identifier, 
             req.query.entrance_id, parseFloat(req.query.entrance_time),
             req.query.exit_id, req.query.exit_time);
