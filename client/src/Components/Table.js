@@ -19,7 +19,7 @@ const Table = (props) => {
     if(config.network.server.https) {
         serverUrl = `https://${config.network.server.https.domain}:${config.network.server.https.port}`;
     } else {
-        serverUrl = `http://${config.network.server.domain}:${config.network.server.http_port}`;
+        serverUrl = `http://${config.network.server.domain}:${config.network.server.http.port}`;
     }
     const [vehicleData, setVehicleData] = useState([]);
 

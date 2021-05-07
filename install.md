@@ -19,33 +19,40 @@ This notation conveys that the key of the JSON is of the datatype denoted in bra
 
 # Information requirements
 
-To set up and deploy this application you must have some information available to you.
+To set up and deploy this application you must have the following information available to you.
 
 * A domain (%DOMAIN%, %PROTOCOL%), running on HTTPS for deployment, HTTP can be used for testing.
 * A client port (%CLIENTPORT%).
-* An HTTP server port (%SERVERHTTPPORT%).
-* Optional - an HTTPS server port (%SERVERHTTPSPORT%).
+* A server port (%SERVERPORT%), for HTTP or HTTPS connections.
 * A MongoDB port (%DBPORT%).
 
 # Setting up Auth0 authentication
 To set up user authentication go to <https://manage.auth0.com/>.
+
+## Create a single page application 
 
 1. Create a single page JavaScript web application.
 2. Go to application settings, the name of the application is not used in the application. Some information here will be used later.
     i. Domain (%APPLICATIONDOMAIN%).
     ii. Client ID (%CLIENTID%)
     iii. Client Secret (%CLIENTSECRET%).
-3. Put "%PROTOCOL%://%DOMAIN%:%CLIENTPORT%", or "%PROTOCOL%://%DOMAIN% if the port is 80 - in the "Allowed Callbacks URLs" box. For example "http://localhost:8081".
-4. Put "%PROTOCOL%://%DOMAIN%:%CLIENTPORT%", or "%PROTOCOL%://%DOMAIN% if the port is 80 - in the "Allowed Logout URLs" box.
-5. Save changes.
-6. Under the Applications tab open APIs and create a new API, the name of the API is not used in the application, however the identifer will be. Some information here will be used later.
+3. Put "%PROTOCOL%://%DOMAIN%:%CLIENTPORT%", or "%PROTOCOL%://%DOMAIN% if the port is 80 and the protocol is HTTP or if the port is 443 and the protocol is HTTPS - in the "Allowed Callbacks URLs" box. For example "http://localhost:8081".
+4. Put "%PROTOCOL%://%DOMAIN% in the "Allowed Callbacks URLs" box.
+5. Put "%PROTOCOL%://%DOMAIN%:%CLIENTPORT%" in the "Allowed Logout URLs" box.
+6. Save changes.
+
+## Create an API
+
+1. Under the Applications tab open APIs and create a new API, the name of the API is not used in the application, however the identifer will be. Some information here will be used later.
     i. Identifier (%APIIDENTIFIER%).
-7. Under permissions add the following permissions:
+2. Under permissions add the following permissions:
 * create:vehicle
 * read:vehicle
 * create:user
-8. Open the Auth Pipeline tab and click on Rules.
-9. Create a new rule, select empty rule, the name of the rule is not used in the application. Enter this code:
+
+## Create a rule
+1. Open the Auth Pipeline tab and click on Rules.
+2. Create a new rule, select empty rule, the name of the rule is not used in the application. Enter this code:
 
 ```javascript
 function emailDomainWhitelist(user, context, callback) {
@@ -77,7 +84,7 @@ function emailDomainWhitelist(user, context, callback) {
 }
 ```
 
-Add emails to the whitelist for users that will be able to access the application.
+3. Add emails to the whitelist for users that you want to be able to access the application.
 
 ## Create roles
 
@@ -86,27 +93,41 @@ There are three user roles: writer, admin and basic. A writer user can only send
 * Add and remove basic users.
 * Change the mode of operation.
 
-Go to the User Management tab and open Roles. 
+1. Go to the User Management tab and open Roles. 
 
-Create a role called "Writer" and go to the Permissions tab and add: 
+2. Create a role called "Writer" and go to the Permissions tab and add: 
 * create:vehicle
 
-Create a role called "Admin" and go to the Permissions tab and add: 
+3. Create a role called "Admin" and go to the Permissions tab and add: 
 * read:vehicle
 * create:user
 
-Create a role called "Basic" and go to the Permissions tab and add: 
+4. Create a role called "Basic" and go to the Permissions tab and add: 
 * read:vehicle
 
 ## Create users
 
-Go to the User Management tab and open Users. 
-
-If you create a user here you will have to supply an email and a password. If you come back to this menu after deploying the application then any users who have logged in with the Google login will also appear.
+1. Go to the User Management tab and open Users. 
+2. Create a user.
+* If you create a user here you will have to supply an email and a password. 
+* If you come back to this menu after deploying the application then any users who have logged in with the Google login will also appear.
 
 ## Assign roles
 
-Go to the User Management tab and open Roles. Click a role and go to the Users tab, click ADD USERS, search for a user and then click assign.
+1. Go to the User Management tab and open Roles. 
+2. Click a role.
+3. Go to the Users tab.
+4. Click ADD USERS.
+5. Search for a user and then click assign.
+
+## Create a machine to machine application for the inference network
+
+1. Go to the Applications tab and open Applications.
+2. Click CREATE APPLICATION and choose Machine to Machine Applcations. 
+3. Name your application whatever you like and click CREATE. 
+4. You will then be prompted to select an authorized API, select the API you create earlier, select the create vehicle permission and click AUTHORIZE to finish.
+
+Take note of the Domain, Client ID and Client Secret for setting up the inference network.
 
 # Deploying the application
 
@@ -132,9 +153,12 @@ Create the config.json file in the /client/src/ directory.
     "network": {
         "server": {
             "domain": "{string} user defined, %DOMAIN%",
-            "http_port": "{integer} user defined, %SERVERHTTPPORT%",
+            "http": {
+                "port": "{integer} user defined, %SERVERHTTPPORT%"
+            },
             "https": {
                 "port": "{integer} user defined, %SERVERHTTPSPORT%",
+                "domain": "{string} user defined, registered domain pointing to local domain, target of SSL certification",
                 "certificate": "{string} absolute path to cert",
                 "key": "{string} absolute path to privkey",
                 "ca": "{string} absolute path to chain"
@@ -143,7 +167,6 @@ Create the config.json file in the /client/src/ directory.
         "client": {
             "domain": "{string} user defined, %DOMAIN%",
             "port": "{integer} user defined, %CLIENTPORT%",
-            "protocol": "{string} web protocol, user defined, %PROTOCOL%"
         }
     },
     "auth": {
@@ -162,32 +185,6 @@ Create the config.json file in the /client/src/ directory.
     },
     "entrances": ["{[string]} list of entrance ids"],
     "operationMode": "{string} deployment, audit or test"
-}
-
-```
-
-Create the users.json file in the server directory.
-
-Add Auth0 users and headless users to this json. Auth0 users are users that can authenticated with the graphical Auth0 interface, this will be any end users. Headless users are users that cannot use the Auth0 strategy to login, the inference network should be one of these users.
-
-The password string should be unencrypted in this file, when login requests are made the passwords should be encrypted using the encryption method specified in the config.json.
-
-## users.json structure
-```json
-{
-    "users": [
-        {
-            "id": "Google ID",
-            "permission": "{string} user defined, must be admin or basic."
-        }
-    ],
-    "users_headless": [
-        {
-            "id": "inferenceNetwork",
-            "password": "{string} user defined, must match the credential setup in the inference network config.",
-            "permission": "writer"
-        }
-    ]
 }
 ```
 

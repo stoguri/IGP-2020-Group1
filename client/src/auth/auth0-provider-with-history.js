@@ -14,7 +14,7 @@ const Auth0ProviderWithHistory = ({ children }) => {
   if(config.network.server.https) {
     callbackURI = `https://${config.network.server.https.domain}:${config.network.client.port}/home`;
   } else {
-    callbackURI = `${config.network.client.protocol}://${config.network.client.domain}:${config.network.client.port}/home`;
+    callbackURI = `http://${config.network.client.domain}:${config.network.client.port}/home`;
   }
 
   return (
