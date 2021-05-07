@@ -170,8 +170,6 @@ app.post('/api/vehicle', authenticateToken, async (req, res) => {
  */
 app.get('/api/vehicle', checkJwt, checkScopes_basicAdmin, async (req, res) => {
     try {
-        console.log(req.originalUrl);
-
         const records = await db.getVehicles(req.query.entrance_id, parseFloat(req.query.entrance_time),
             req.query.exit_id, parseFloat(req.query.exit_time), req.query.inclusive);
 
@@ -204,12 +202,12 @@ app.get('/api/vehicle', checkJwt, checkScopes_basicAdmin, async (req, res) => {
         // }
 
         for (let i = 0; i < records.length; i++) {
-            console.log(records[i]);
             details.time[i] = records[i].entrance_time;
             details.exit[i] = records[i].exit_id;
             details.route[i] = `${records[i].entrance_id} -> ${records[i].exit_id}`;
         }
 
+        console.log(details);
         res.json(details);
     } catch (e) {
         console.error(e);
