@@ -10,7 +10,12 @@ const Auth0ProviderWithHistory = ({ children }) => {
   const clientId = `${config.auth.clientID}`;
   const audience = `${config.auth.api.identifier}`;
 
-  const callbackURI = `${config.network.client.protocol}://${config.network.client.domain}:${config.network.client.port}/home`;
+  let callbackURI;
+  if(config.network.server.https) {
+    callbackURI = `https://${config.network.server.https.domain}:${config.network.client.port}/home`;
+  } else {
+    callbackURI = `${config.network.client.protocol}://${config.network.client.domain}:${config.network.client.port}/home`;
+  }
 
   return (
     <Auth0Provider

@@ -15,7 +15,12 @@ const Table = (props) => {
 
     const { getAccessTokenSilently } = useAuth0();
     //const serverUrl = `https://${config.network.server.domain}:${config.network.server.https.port}`;
-    const serverUrl = `http://${config.network.server.domain}:${config.network.server.http_port}`;
+    let serverUrl;
+    if(config.network.server.https) {
+        serverUrl = `https://${config.network.server.https.domain}:${config.network.server.https.port}`;
+    } else {
+        serverUrl = `http://${config.network.server.domain}:${config.network.server.http_port}`;
+    }
     const [vehicleData, setVehicleData] = useState([]);
 
     const columns = [
