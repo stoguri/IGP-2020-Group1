@@ -64,7 +64,7 @@ const checkJwt = jwt({
 });
 
 const checkScopes_basicAdmin = jwtAuthz(['read:vehicle']);
-const checkScopes_admin = jwtAuthz(['create:user', 'read:vehicle']);
+const checkScopes_admin = jwtAuthz(['create:user', 'read:vehicle', 'read:vehicle_audit']);
 const checkScopes_writer = jwtAuthz(['create:vehicle']);
 
 // %%% API routes and functions %%%
@@ -85,7 +85,6 @@ const checkScopes_writer = jwtAuthz(['create:vehicle']);
  */
 app.post('/api/vehicle', checkJwt, checkScopes_writer, async (req, res) => {
     try {
-        console.log(req.query);
         const status = await db.newVehicle(req.query.identifier, 
             req.query.entrance_id, parseFloat(req.query.entrance_time),
             req.query.exit_id, req.query.exit_time);
@@ -112,45 +111,116 @@ app.post('/api/vehicle', checkJwt, checkScopes_writer, async (req, res) => {
  */
 app.get('/api/vehicle', checkJwt, checkScopes_basicAdmin, async (req, res) => {
     try {
-        const records = await db.getVehicles(req.query.entrance_id, parseFloat(req.query.entrance_time),
-            req.query.exit_id, parseFloat(req.query.exit_time), req.query.inclusive);
+        if(req.query.entrance_id && req.query.exit_id) {
+            // records using route with entrance and exit
+            const records = await db.getVehicleData(req.query.entrance_id, 
+                req.query.exit_id, null,
+                parseInt(req.query.entrance_time), parseInt(req.query.exit_time),
+                req.query.inclusive);
 
-        //console.log(records);
+            res.send(records.length);
+        } else if(req.query.entrance_id) {
+            // records using this junction as entrance
+            const records = await db.getVehicleData(req.query.entrance_id, null, null, 
+                parseInt(req.query.entrance_time), parseInt(req.query.exit_time),
+                req.query.inclusive);
+            
+            const details = {entrance: records.length, exit: {}, route: {}};
 
+            // construct details array
+            // load entrances from config
+            for (const exit of config.entrances) {
+                details.exit[exit] = 0;
+                // routes
+                details.route[`${req.query.entrance_id}->${exit}`] = 0;
+            }
 
-        const details = { time: {}, exit: {}, route: {} };
+            for(const record of records) {
+                details.exit[record.exit_id]++;
+                details.route[`${req.query.entrance_id}->${record.exit_id}`]++;
+            }
 
-        // construct details array
-        // load entrances from config
-        // for (const entrance of config.entrances) {
-        //     details.entrance[entrance] = 0;
-        //     details.exit[entrance] = 0;
-        //     // routes
-        //     for (const e of config.entrances) {
-        //         if (entrance == e) {
-        //             continue;
-        //         }
-        //         details.route[`${entrance}-${e}`] = 0;
-        //     }
-        // }
+            res.json(details);
+        } else if(req.query.exit_id) {
+            // records using this junction as entrance
+            const records = await db.getVehicleData(null, req.query.exit_id, null, 
+                parseInt(req.query.entrance_time), parseInt(req.query.exit_time),
+                req.query.inclusive);
+            
+            const details = {entrance: {}, exit: records.length, route: {}};
 
-        // // derived fields
-        // for (const record of records) {
-        //     details.entrance[record.entrance_id]++;
-        //     if (record.exit_id != null) {
-        //         details.exit[record.exit_id]++;
-        //         details.route[`${record.entrance_id}-${record.exit_id}`]++;
-        //     }
-        // }
+            // construct details array
+            // load entrances from config
+            for(const entrance of config.entrances) {
+                details.entrance[entrance] = 0;
+                // routes
+                details.route[`${entrance}->${req.query.exit_id}`] = 0;
+            }
 
-        for (let i = 0; i < records.length; i++) {
-            details.time[i] = records[i].entrance_time;
-            details.exit[i] = records[i].exit_id;
-            details.route[i] = `${records[i].entrance_id} -> ${records[i].exit_id}`;
-        }
+            for(const record of records) {
+                details.entrance[record.entrance_id]++;
+                details.route[`${record.entrance_id}->${req.query.exit_id}`]++;
+            }
 
-        console.log(details);
-        res.json(details);
+            res.json(details);
+        } else if(req.query.junction_id) {
+            // records using this junction as entrance or exit 
+            const records = await db.getVehicleData(null, null, req.query.junction_id,
+                parseInt(req.query.entrance_time), parseInt(req.query.exit_time),
+                req.query.inclusive);
+
+            const details = {entrance: 0, exit: 0, route: {}};
+
+            for(const id of config.entrances) {
+                if(id == req.query.junction_id) {
+                    continue;
+                }
+                details.route[`${req.query.junction_id}->${id}`] = 0;
+                details.route[`${id}->${req.query.junction_id}`] = 0;
+            }
+
+            for(const record of records) {
+                if(record.entrance_id == req.query.junction_id) {
+                    details.entrance++;
+                    details.route[`${req.query.junction_id}->${record.exit_id}`]++;
+                } else if(record.exit_id == req.query.junction_id) {
+                    details.exit++;
+                    details.route[`${record.entrance_id}->${req.query.junction_id}`]++;
+                }
+            }
+
+            res.json(details);
+        } else {
+            // all records
+            const records = await db.getVehicleData(null, null, null, 
+                parseInt(req.query.entrance_time), parseInt(req.query.exit_time),
+                req.query.inclusive);
+
+            const details = { entrance: {}, exit: {}, route: {} };
+
+            // construct details array
+            // load entrances from config
+            for (const entrance of config.entrances) {
+                details.entrance[entrance] = 0;
+                details.exit[entrance] = 0;
+                // routes
+                for (const exit of config.entrances) {
+                    if (entrance == exit) {
+                        continue;
+                    }
+                    details.route[`${entrance}->${exit}`] = 0;
+                }
+            }
+
+            // derived fields
+            for (const record of records) {
+                details.entrance[record.entrance_id]++;
+                details.exit[record.exit_id]++;
+                details.route[`${record.entrance_id}->${record.exit_id}`]++;
+            }
+
+            res.json(details);
+        }        
     } catch (e) {
         console.error(e);
         res.sendStatus(500);
@@ -158,9 +228,17 @@ app.get('/api/vehicle', checkJwt, checkScopes_basicAdmin, async (req, res) => {
 });
 
 if (config.operationMode == "audit") {
-    app.get('/api/vehicle', async (req, res) => {
-
-    })
+    app.get('/api/audit/vehicle', checkJwt, checkScopes_admin, async (req, res) => {
+        // serve all vehicle records
+        try {
+            const records = await db.getVehicles(req.query.entrance_id, req.query.exit_id, req.query.junction_id,
+            	parseInt(req.query.entrance_time), parseInt(req.query.exit_time), req.query.inclusive);
+            res.json(records);
+        } catch (e) {
+            console.error(e);
+            res.sendStatus(500);
+        }
+    }) 
 }
 
 module.exports = app;

@@ -19,17 +19,6 @@ client.connect(err => {
     }
 });
 
-module.exports.getPermissionLevel = async function(userID) {
-    try {
-        const collection = await db.collection('users');
-        const record = await collection.findOne({id: userID});
-        return record.permission;
-    } catch(e) {
-        console.error(e);
-        return null;
-    }
-}
-
 /**
  * Adds a new vehicle record
  * @param {identifer} identifier of new vehicle
@@ -64,33 +53,36 @@ module.exports.newVehicle = async function(identifier, entrance_id, entrance_tim
  * @param {boolean} inclusive if the times give are inclusive or exclusive
  * @returns {array} found records
  */
-module.exports.getVehicles = async function(entrance_id, entrance_time, exit_id, exit_time, inclusive){
+module.exports.getVehicleData = async function(entrance_id, exit_id, junction_id, entrance_time, exit_time, inclusive) {
     try {
         const collection = await db.collection("vehicles");
 
         // construct query
         const query = {};
-        query.entrance_id = entrance_id;
-        // if(entrance_id) {
-        //     query.entrance_id = entrance_id;
-        // }
-        // if(exit_id) {
-        //     query.exit_id = exit_id;
-        // }
-        // if(entrance_time) {
-        //     if(inclusive == 'true') {
-        //         query.entrance_time = {$gte: entrance_time};
-        //     } else {
-        //         query.entrance_time = {$lte: entrance_time};
-        //     }
-        // }
-        // if(exit_time) {
-        //     if(inclusive == 'true') {
-        //         query.exit_time = {$lte: exit_time};
-        //     } else {
-        //         query.exit_time = {$gte: exit_time};
-        //     }
-        // }
+        if(entrance_id) {
+            query.entrance_id = entrance_id;
+        }
+        if(exit_id) {
+            query.exit_id = exit_id;
+        }
+        if(junction_id) {
+            query['$or'] = [{entrance_id: junction_id}, {exit_id: junction_id}];
+        }
+
+        if(entrance_time) {
+            if(inclusive == 'true') {
+                query.entrance_time = {$gte: entrance_time};
+            } else {
+                query.entrance_time = {$lte: entrance_time};
+            }
+        }
+        if(exit_time) {
+            if(inclusive == 'true') {
+                query.exit_time = {$lte: exit_time};
+            } else {
+                query.exit_time = {$gte: exit_time};
+            }
+        }
 
         // make query
         return await collection.find(query).toArray();

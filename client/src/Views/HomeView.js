@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState} from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { useAuth0 } from '@auth0/auth0-react';
 import { Box, Card, CardHeader, CardMedia, Grid, List, ListItem, Paper } from '@material-ui/core';
@@ -38,7 +38,7 @@ export default function HomeView() {
 
     const { isAuthenticated } = useAuth0();
     const [videoList, setVideoList] = useState(["id0", "id1", "id2", "id3", "id4"]);
-    const date = new Date;
+    const date = new Date();
 
     // Entrance numbers/id must be defined
     const handleVideoClicks = (props) => {
