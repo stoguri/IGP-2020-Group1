@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
-import { makeStyles, TableBody, TableCell, TableRow } from '@material-ui/core';
+import { makeStyles, Paper, TableBody, TableCell, TableRow } from '@material-ui/core';
 import config from '../config.json';
 
 const useStyles = makeStyles((theme) => ({
@@ -60,7 +60,7 @@ const Table = (props) => {
 
     const classes = useStyles();
     return (
-        <Table className={classes.root} elevation={10}>
+        <Paper className={classes.root} elevation={10}>
             <TableBody>
                 <TableRow key='entrance'>
                     <TableCell>Number of vehicles using this entrance</TableCell>
@@ -71,7 +71,7 @@ const Table = (props) => {
                     <TableCell align="right">{vehicleData.exit}</TableCell>
                 </TableRow>
             </TableBody>
-        </Table>
+        </Paper>
     )
 }
 
