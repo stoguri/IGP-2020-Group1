@@ -1,6 +1,5 @@
 import { io } from 'socket.io-client';
 import config from '../config.json';
-import { Table } from './Table.js';
 
 let serverUrl;
 if (config.network.server.https) {
@@ -9,39 +8,50 @@ if (config.network.server.https) {
     serverUrl = `http://${config.network.server.domain}:${config.network.server.http.port}`;
 }
 
-function onMessage(e) {
-    console.log("message received");
-    console.log(e);
+let junction_id, vehicleData, setVehicleData;
 
-    /*
-    {
-        junction_id: id0,
-        fields: {
-            "entrance": 4
-            "id0->id1": 3
-        }
+function vehicleDataUpdate(e) {
+    console.log("vehicle data update received");
+
+    /* data structure
+     * fields value is incremented by 1 if given
+    e = {
+        junction_id: 'id0',
+        fields: ["Number of cars entered through this camera", "id0->id1"]
     }
     */
 
-    // get current data from table
+    // check if vehicle data is for junction currently in view
+    if(e.junction_id != junction_id) {
+        return;
+    }
 
     // update fields that have changed
-
+    // find row in vehicle data where id matches field to be updated
+    for(const row of vehicleData) {
+        for(const field of e.fields) {
+            if(row.id == field) {
+                row.value++;
+            }
+        }
+    }
     // set table data
+    setVehicleData(vehicleData);
 };
 
-export const initSocket = () => {
+export const initSocket = (j_id, vData, set_vData) => {
+    junction_id = j_id;
+    vehicleData = vData;
+    setVehicleData = set_vData;
+
     // initialise socket for updating data in real time
     let socket = io(serverUrl);
 
-    socket.on("message", onMessage);
+    socket.on("vehicleDataUpdate", vehicleDataUpdate);
 
     socket.on("connect", () => {
         console.log("socket connected");
-    });
-    socket.emit("id0", "message");
-
-    return socket;
+    })
 }
 
 export default initSocket;

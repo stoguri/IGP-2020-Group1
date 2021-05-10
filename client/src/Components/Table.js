@@ -38,7 +38,6 @@ export const Table = (props) => {
      * @returns {json} vehicle data
      */
     async function getVehicleDataSecurely(junction_id) {
-        console.log(junction_id)
         try {
             const token = await getAccessTokenSilently({
                 audience: config.auth.api.identifier,
@@ -55,8 +54,6 @@ export const Table = (props) => {
                 }
             );
 
-            initSocket();
-
             return await response.json();
         } catch (error) {
             alert(error.message);
@@ -67,7 +64,7 @@ export const Table = (props) => {
         async function fetchAndSetData() {
             const res = await getVehicleDataSecurely(props.camera);
             let newData = []
-            const entrance_row = {id: "Number of cars entered this camera", value: res.entrance}
+            const entrance_row = {id: "Number of cars entered through this camera", value: res.entrance}
             const exit_row = {id: "Number of cars exiting through this camera", value: res.exit}
             newData.push(entrance_row)
             newData.push(exit_row)
@@ -79,7 +76,10 @@ export const Table = (props) => {
                 const row = { id: `${route_keys[i]}`, value: `${routes[route_keys[i]]}` }
                 newData.push(row);
             }
+
             setVehicleData(newData);
+
+            initSocket(props.camera, newData, setVehicleData);
         }
         fetchAndSetData()
     }, [props.camera])
