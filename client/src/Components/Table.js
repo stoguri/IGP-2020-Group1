@@ -69,6 +69,8 @@ const Table = (props) => {
             newData.push(exit_row)
             const routes = res.route
             const route_keys = Object.keys(routes)
+            const header = { id: 'Routes: ', value: '' }
+            newData.push(header);
             for (let i = 0; i < route_keys.length; i++) {
                 const row = { id: `${route_keys[i]}`, value: `${routes[route_keys[i]]}` }
                 newData.push(row);
@@ -81,7 +83,7 @@ const Table = (props) => {
     const classes = useStyles();
     return (
         <Paper className={classes.root} elevation={10}>
-            <DataGrid className={classes.grid} rows={vehicleData} columns={columns} />
+            <DataGrid className={classes.grid} rows={vehicleData} columns={columns} pageSize={10}/>
         </Paper>
     )
 }
