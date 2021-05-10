@@ -3,6 +3,7 @@
     <script src="auth.js"></script>
     <script src="pages/main.js"></script>
     <script src="pages/splash.js"></script>
+
     <link rel="stylesheet" type="text/css" href="css/index.css">
     <title>Traffic Surviellance Application</title>
 </head>
@@ -12,8 +13,23 @@
 
     <main>
         <p>Main content...</p>
-        <video id="videoPlayer" controls>
-            <source src="http://localhost:3000/liveStream" type="video/mp4">
-        </video>
+        <!-- <video id="videoPlayer" controls>
+            <source src="http://localhost:3001/liveStreamSource" type="video/mp4">
+        </video> -->
+
+        <script src="https://cdn.bootcss.com/flv.js/1.5.0/flv.min.js"></script>
+        <video id="videoElement"></video>
+        <script>
+            if (flvjs.isSupported()) {
+                var videoElement = document.getElementById('videoElement');
+                var flvPlayer = flvjs.createPlayer({
+                    type: 'flv',
+                    url: 'http://localhost:8000/live/stream1.flv'
+                });
+                flvPlayer.attachMediaElement(videoElement);
+                flvPlayer.load();
+                flvPlayer.play();
+            }
+        </script>
     </main>
 </body>

@@ -15,7 +15,7 @@ app.use('/', express.static('client', { 'extensions': ['html'] }));
 const fs = require('fs');
 
 app.get('/liveStreamSource', function (req, res) {
-    const path = 'sample.mp4'
+    const path = './streamer/sample.mp4'
     const stat = fs.statSync(path)
     const fileSize = stat.size
     console.log(fileSize)
