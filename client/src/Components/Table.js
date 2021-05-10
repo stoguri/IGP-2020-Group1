@@ -3,6 +3,7 @@ import { useAuth0 } from '@auth0/auth0-react';
 import { makeStyles, Paper } from '@material-ui/core';
 import { DataGrid } from '@material-ui/data-grid';
 import config from '../config.json';
+import { initSocket } from '../Components/Socket.js';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -14,15 +15,15 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const Table = (props) => {
-    const { getAccessTokenSilently } = useAuth0();
+let serverUrl;
+if (config.network.server.https) {
+    serverUrl = `https://${config.network.server.https.domain}:${config.network.server.https.port}`;
+} else {
+    serverUrl = `http://${config.network.server.domain}:${config.network.server.http.port}`;
+}
 
-    let serverUrl;
-    if (config.network.server.https) {
-        serverUrl = `https://${config.network.server.https.domain}:${config.network.server.https.port}`;
-    } else {
-        serverUrl = `http://${config.network.server.domain}:${config.network.server.http.port}`;
-    }
+export const Table = (props) => {
+    const { getAccessTokenSilently } = useAuth0();
 
     const columns = [
         {field: "id", headerName: 'Field', flex: 0.75, sortable: false},
@@ -53,6 +54,8 @@ const Table = (props) => {
                     },
                 }
             );
+
+            initSocket();
 
             return await response.json();
         } catch (error) {
@@ -88,5 +91,3 @@ const Table = (props) => {
         </Paper>
     )
 }
-
-export default Table;

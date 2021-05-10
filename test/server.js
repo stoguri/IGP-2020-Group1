@@ -3,15 +3,10 @@
 
 const crypto = require('crypto');
 const session = require('supertest-session');
+const request = require('request');
 
 const config = require('../client/src/config.json');
 const app = require('../server/server.js');
-
-const testData = require('../server/db/testData.json');
-
-const writer = testData.users[0];
-const admin = testData.users[1];
-const basic = testData.users[2];
 
 // %%% functions %%%
 
@@ -54,6 +49,59 @@ function checkVehicleDataJSONs(expected, real) {
     }
 }
 
+const body = {
+    client_id: config.auth.test.writer.clientID,
+    client_secret: config.auth.test.writer.clientSecret,
+    audience: config.auth.api.identifier,
+    grant_type: "client_credentials"
+}
+
+const options = { 
+    method: 'POST',
+    url: `https://${config.auth.domain}/oauth/token`,
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify(body)
+}
+
+//let token = null;
+
+function authorize() {
+    request(options, function (error, response, body) {
+        if(error) {
+            throw new Error(error);
+        }
+        body = JSON.parse(body);
+        //console.log(body);
+        //token = body.access_token;
+    });
+}
+
+describe("Test machine-machine authorization", () => {
+    beforeEach(() => {
+        authorize();
+    });
+
+    describe("able to obtain access token", () => {
+        console.log("token: " + token);
+    })
+})
+
+/*
+const options = {
+    method: 'POST',
+    url: 'https://' + config.auth.domain + '/oauth/token',
+    body: body
+}
+
+console.log(body);
+
+request(options, function(error, response, body) {
+    if(error) throw new Error(error);
+    console.log(body);
+})
+*/
+
+/*
 let testSession;
 
 // %%% test cases %%%
@@ -792,3 +840,4 @@ describe("GET /api/vehicle/", () => {
         // - exclusive
     })
 });
+*/

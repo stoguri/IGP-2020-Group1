@@ -1,5 +1,6 @@
 import { io } from 'socket.io-client';
 import config from '../config.json';
+import { Table } from './Table.js';
 
 let serverUrl;
 if (config.network.server.https) {
@@ -8,25 +9,32 @@ if (config.network.server.https) {
     serverUrl = `http://${config.network.server.domain}:${config.network.server.http.port}`;
 }
 
-//function initSocket() {
-export const initSocket = () => {
-    // initialise socket for updating data in real time
-    let socket = io(serverUrl);
+function onMessage(e) {
+    console.log("message received");
+    console.log(e);
 
-    socket.on("message", (e) => {
-        console.log("message received");
-        console.log(e);
-
-        /*
-        {
+    /*
+    {
         junction_id: id0,
         fields: {
             "entrance": 4
             "id0->id1": 3
         }
-        }
-        */
-    });
+    }
+    */
+
+    // get current data from table
+
+    // update fields that have changed
+
+    // set table data
+};
+
+export const initSocket = () => {
+    // initialise socket for updating data in real time
+    let socket = io(serverUrl);
+
+    socket.on("message", onMessage);
 
     socket.on("connect", () => {
         console.log("socket connected");
