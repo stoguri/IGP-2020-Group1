@@ -76,22 +76,5 @@
             "exit_id": "id1",
             "exit_time": 1618224327058
         }
-    ],
-    "users": [
-        {
-            "id": "testWriter",
-            "password": "passwordWriter123",
-            "permission": "writer"
-        },
-        {
-            "id": "testAdmin",
-            "password": "passwordAdmin123",
-            "permission": "admin"
-        },
-        {
-            "id": "testBasic",
-            "password": "passwordBasic123",
-            "permission": "basic"
-        }
     ]
 }

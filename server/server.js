@@ -9,6 +9,7 @@ const https = require('https');
 const jwt = require('express-jwt');
 const jwtAuthz = require('express-jwt-authz');
 const jwksRsa = require('jwks-rsa');
+const crypto = require('crypto');
 // our modules
 const db = require('./db/main.js');
 
@@ -20,6 +21,7 @@ const app = express();
 
 app.use(cors());
 
+let server;
 // https server
 if(config.network.server.https) {
     const credentials = {
@@ -27,15 +29,15 @@ if(config.network.server.https) {
         cert: fs.readFileSync(config.network.server.https.certificate, 'utf8'),
         ca: fs.readFileSync(config.network.server.https.ca, 'utf8')
     }
-    const httpsServer = https.createServer(credentials, app);
-    httpsServer.listen(config.network.server.https.port, () => {
+    server = https.createServer(credentials, app);
+    server.listen(config.network.server.https.port, () => {
         console.log(`HTTPS server running in ${config.operationMode} mode, listening on: ` + 
             `https://${config.network.server.domain}:${config.network.server.https.port}`);
     });
 } else {
     // http server
-    const httpServer = http.createServer(app);
-    httpServer.listen(config.network.server.http.port, () => {
+    server = http.createServer(app);
+    server.listen(config.network.server.http.port, () => {
     console.log(`HTTP server running in ${config.operationMode} mode, listening on: ` + 
         `http://${config.network.server.domain}:${config.network.server.http.port}`);
     });
@@ -66,6 +68,20 @@ const checkJwt = jwt({
 const checkScopes_basicAdmin = jwtAuthz(['read:vehicle']);
 const checkScopes_admin = jwtAuthz(['create:user', 'read:vehicle', 'read:vehicle_audit']);
 const checkScopes_writer = jwtAuthz(['create:vehicle']);
+
+// %%% socket framework %%%
+
+const io = require('socket.io')(server, {
+    cors: {
+        origin: '*'
+    }
+});
+
+io.on('connection', (socket) => {
+    console.log('a user connected');
+
+    io.emit("message", "message");
+})
 
 // %%% API routes and functions %%%
 

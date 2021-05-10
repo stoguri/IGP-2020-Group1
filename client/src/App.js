@@ -24,7 +24,7 @@ const useStyles = makeStyles({
     }
 })
 
-export default function App() {
+export default function App(props) {
 
     const { isLoading } = useAuth0();
     const classes = useStyles()

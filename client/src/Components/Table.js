@@ -21,7 +21,7 @@ const Table = (props) => {
     if (config.network.server.https) {
         serverUrl = `https://${config.network.server.https.domain}:${config.network.server.https.port}`;
     } else {
-        serverUrl = `http://${config.network.server.http.domain}:${config.network.server.http.port}`;
+        serverUrl = `http://${config.network.server.domain}:${config.network.server.http.port}`;
     }
 
     const columns = [
@@ -43,7 +43,8 @@ const Table = (props) => {
                 audience: config.auth.api.identifier,
                 scope: "read:vehicle"
             });
-            
+
+            // get initial data
             const response = await fetch(
                 `${serverUrl}/api/vehicle?junction_id=${junction_id}`,
                 {
@@ -52,7 +53,7 @@ const Table = (props) => {
                     },
                 }
             );
-            
+
             return await response.json();
         } catch (error) {
             alert(error.message);
