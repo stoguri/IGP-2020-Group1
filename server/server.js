@@ -189,6 +189,7 @@ app.get('/api/vehicle', checkJwt, checkScopes_basicAdmin, async (req, res) => {
                 }
             }
 
+            //console.log(details);
             res.json(details);
         } else {
             // all records

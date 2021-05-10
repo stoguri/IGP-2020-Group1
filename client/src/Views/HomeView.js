@@ -97,7 +97,7 @@ export default function HomeView() {
                                     {videoList[3]}
                                 </ListItem>
                             </Paper>
-                            <Paper className={classes.videoListItem} onClick={() => { handleVideoClicks('5') }} elevation={10}>
+                            <Paper className={classes.videoListItem} elevation={10}>
                                 <ListItem>
                                     {videoList[4]}
                                 </ListItem>
