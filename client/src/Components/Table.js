@@ -25,8 +25,8 @@ const Table = (props) => {
     }
 
     const columns = [
-        {field: "id", headerName: 'Field', flex: 0.5},
-        {field: "value", headerName: "Value", flex: 0.5}
+        {field: "id", headerName: 'Field', flex: 0.75, sortable: false},
+        {field: "value", headerName: "Value", flex: 0.25, sortable: false}
     ]
 
     const [vehicleData, setVehicleData] = useState([]);
@@ -83,7 +83,7 @@ const Table = (props) => {
     const classes = useStyles();
     return (
         <Paper className={classes.root} elevation={10}>
-            <DataGrid className={classes.grid} rows={vehicleData} columns={columns} pageSize={10}/>
+            <DataGrid className={classes.grid} rows={vehicleData} columns={columns} pageSize={9} disableColumnMenu />
         </Paper>
     )
 }
