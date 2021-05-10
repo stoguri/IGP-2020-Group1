@@ -1,5 +1,3 @@
-http://localhost:8000/admin/streams
-
 # node-media-server (original link: https://www.npmjs.com/package/node-media-server)
 Install node-media-server as below 
 
@@ -47,6 +45,9 @@ Replace "STREAM" with the desired stream name
 ```
 ffmpeg -re -i sample.mp4 -c:v libx264 -preset veryfast -tune zerolatency -c:a aac -ar 44100 -f flv rtmp://localhost/live/STREAM
 ```
+
+# testing stream
+You can view current streams while the nms is running, here: http://localhost:8000/admin/streams
 
 # front-end
 This is the html/js for serving the livestream in the browser. Note that script only needs to be called once - do not duplicate the cdn request.
