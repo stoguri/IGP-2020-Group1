@@ -35,9 +35,10 @@ function vehicleDataUpdate(e) {
             }
         }
     }
+    const newData = [];
     // spread data without creating copy
-    for(const item of vehicleData.length) {
-        newData[i] = {...item};
+    for(let i = 0; i < vehicleData.length; i++) {
+        newData[i] = {...vehicleData[i]};
     }
     // set table data
     setVehicleData(newData);
