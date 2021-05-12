@@ -4,7 +4,6 @@ import { BrowserRouter as Router } from "react-router-dom";
 import Auth0ProviderWithHistory from './auth/auth0-provider-with-history';
 import App from './App.js';
 import reportWebVitals from './Services/Logging/reportWebVitals';
-import { initSocket } from './Components/Socket.js';
 
 // Render App component into the browser
 ReactDOM.render(

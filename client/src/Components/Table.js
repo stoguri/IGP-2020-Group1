@@ -79,16 +79,84 @@ export const Table = (props) => {
             makeSocket();
 
             // get initial data
-            const response = await fetch(
-                `${serverUrl}/api/vehicle?junction_id=${props.camera}`,
+            const response = [
                 {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
+                    "identifier": "0",
+                    "entrance_id": "id3", 
+                    "entrance_time": 1618224200897,
+                    "exit_id": "id2",
+                    "exit_time": 1618224210882
+                },
+                {
+                    "identifier": "1",
+                    "entrance_id": "id1", 
+                    "entrance_time": 1618224215826,
+                    "exit_id": "id0",
+                    "exit_time": 1618224220338
+                },
+                {
+                    "identifier": "2",
+                    "entrance_id": "id1", 
+                    "entrance_time": 1618224224436,
+                    "exit_id": "id2",
+                    "exit_time": 1618224228261
+                },
+                {
+                    "identifier": "3",
+                    "entrance_id": "id0", 
+                    "entrance_time": 1618224236372,
+                    "exit_id": "id3",
+                    "exit_time": 1618224240821
+                },
+                {
+                    "identifier": "4",
+                    "entrance_id": "id3", 
+                    "entrance_time": 1618224258089,
+                    "exit_id": "id0",
+                    "exit_time": 1618224263735
+                },
+                {
+                    "identifier": "5",
+                    "entrance_id": "id3", 
+                    "entrance_time": 1618224268971,
+                    "exit_id": "id0",
+                    "exit_time": 1618224272888
+                },        {
+                    "identifier": "6",
+                    "entrance_id": "id0", 
+                    "entrance_time": 1618224279863,
+                    "exit_id": "id1",
+                    "exit_time": 1618224284825
+                },
+                {
+                    "identifier": "7",
+                    "entrance_id": "id1", 
+                    "entrance_time": 1618224288906,
+                    "exit_id": "id2",
+                    "exit_time": 1618224297307
+                },
+                {
+                    "identifier": "8",
+                    "entrance_id": "id1", 
+                    "entrance_time": 1618224302313,
+                    "exit_id": "id2",
+                    "exit_time": 1618224306856
+                },
+                {
+                    "identifier": "9",
+                    "entrance_id": "id2", 
+                    "entrance_time": 1618224312476,
+                    "exit_id": "id1",
+                    "exit_time": 1618224316937
+                },
+                {
+                    "identifier": "10",
+                    "entrance_id": "id0", 
+                    "entrance_time": 1618224323036,
+                    "exit_id": "id1",
+                    "exit_time": 1618224327058
                 }
-            );
-
-            return await response.json();
+            ]
         } catch (error) {
             alert(error.message);
         }
@@ -96,24 +164,24 @@ export const Table = (props) => {
 
     useEffect(() => {
         async function fetchAndSetData() {
-            const res = await getVehicleDataSecurely(props.camera);
+            // const res = await getVehicleDataSecurely(props.camera);
 
-            let newData = []
-            const entrance_row = {id: "Number of cars entered through this camera", value: res.entrance}
-            const exit_row = {id: "Number of cars exiting through this camera", value: res.exit}
-            newData.push(entrance_row)
-            newData.push(exit_row)
-            const routes = res.route
-            const route_keys = Object.keys(routes)
-            const header = { id: 'Routes: ', value: '' }
-            newData.push(header);
-            for (let i = 0; i < route_keys.length; i++) {
-                const row = { id: `${route_keys[i]}`, value: `${routes[route_keys[i]]}` }
-                newData.push(row);
-            }
+            // let newData = []
+            // const entrance_row = {id: "Number of cars entered through this camera", value: res.entrance}
+            // const exit_row = {id: "Number of cars exiting through this camera", value: res.exit}
+            // newData.push(entrance_row)
+            // newData.push(exit_row)
+            // const routes = res.route
+            // const route_keys = Object.keys(routes)
+            // const header = { id: 'Routes: ', value: '' }
+            // newData.push(header);
+            // for (let i = 0; i < route_keys.length; i++) {
+            //     const row = { id: `${route_keys[i]}`, value: `${routes[route_keys[i]]}` }
+            //     newData.push(row);
+            // }
 
-            setVehicleData(newData);
-            currentVehicleData = newData;
+            // setVehicleData(newData);
+            // currentVehicleData = newData;
 
             //initSocket(props.camera, newData, setVehicleData);
         }
