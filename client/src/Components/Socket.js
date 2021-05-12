@@ -35,8 +35,12 @@ function vehicleDataUpdate(e) {
             }
         }
     }
+    // spread data without creating copy
+    for(const item of vehicleData.length) {
+        newData[i] = {...item};
+    }
     // set table data
-    setVehicleData([...vehicleData]);
+    setVehicleData(newData);
 };
 
 export const initSocket = (j_id, vData, set_vData) => {
