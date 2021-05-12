@@ -80,7 +80,12 @@ const io = require('socket.io')(server, {
 io.on('connection', (socket) => {
     console.log('a user connected');
 
-    io.emit("message", "message");
+    /*
+    io.emit("vehicleDataUpdate", {
+        junction_id: 'id0',
+        fields: ["Number of cars entered through this camera", "id0->id1"]
+    });
+    */
 })
 
 // %%% API routes and functions %%%
@@ -104,6 +109,21 @@ app.post('/api/vehicle', checkJwt, checkScopes_writer, async (req, res) => {
         const status = await db.newVehicle(req.query.identifier, 
             req.query.entrance_id, parseFloat(req.query.entrance_time),
             req.query.exit_id, req.query.exit_time);
+
+        // send socket messages
+        // one for entrance
+        io.emit("vehicleDataUpdate", {
+            junction_id: req.query.entrance_id,
+            fields: ["Number of cars entered through this camera", 
+                `${req.query.entrance_id}->${req.query.exit_id}`]
+        });
+        // one for exit
+        io.emit("vehicleDataUpdate", {
+            junction_id: req.query.exit_id,
+            fields: ["Number of cars exited through this camera", 
+                `${req.query.entrance_id}->${req.query.exit_id}`]
+        });
+
         res.sendStatus(status);
     } catch (e) {
         console.error(e);
@@ -116,9 +136,10 @@ app.post('/api/vehicle', checkJwt, checkScopes_writer, async (req, res) => {
  * @apiName GetVehicle
  * @apiGroup basic, admin
  * 
- * @apiParam {string} entrance_id
+ * @apiParam {string} entrance_id - vehicles must enter using this entrance
+ * @apiParam {string} exit_id - vehicles must exit using this exit
+ * @apiParam {string} junction_id - vehicles must use this junction at some point throughout their route
  * @apiParam {integer} entrance_time epoch time
- * @apiParam {string} exit_id
  * @apiParam {integer} exit_time epoch time
  * @apiParam {boolean} inclusive if the times give are inclusive or exclusive
  *

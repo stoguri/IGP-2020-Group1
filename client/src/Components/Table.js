@@ -4,6 +4,7 @@ import { makeStyles, Paper } from '@material-ui/core';
 import { DataGrid } from '@material-ui/data-grid';
 import config from '../config.json';
 import { initSocket } from '../Components/Socket.js';
+import { io } from 'socket.io-client';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -31,22 +32,55 @@ export const Table = (props) => {
     ]
 
     const [vehicleData, setVehicleData] = useState([]);
+    let currentVehicleData;
+
+    function onMessage(e) {
+        // check if vehicle data is for junction currently in view
+        if(e.junction_id != props.camera) {
+            return;
+        }
+
+        // update fields that have changed
+        // find row in vehicle data where id matches field to be updated
+        for(const row of currentVehicleData) {
+            for(const field of e.fields) {
+                if(row.id == field) {
+                    row.value++;
+                }
+            }
+        }
+        // set table data
+        setVehicleData(currentVehicleData);
+    }
+
+    function makeSocket() {    
+        // initialise socket for updating data in real time
+        let socket = io(serverUrl);
+    
+        socket.on("vehicleDataUpdate", onMessage);
+    
+        socket.on("connect", () => {
+            console.log("socket connected");
+        })
+    }
+
 
     /**
      * Gets the vehicle data based on the current junction in view
-     * @param {integer} junction_id 
      * @returns {json} vehicle data
      */
-    async function getVehicleDataSecurely(junction_id) {
+    async function getVehicleDataSecurely() {
         try {
             const token = await getAccessTokenSilently({
                 audience: config.auth.api.identifier,
                 scope: "read:vehicle"
             });
 
+            makeSocket();
+
             // get initial data
             const response = await fetch(
-                `${serverUrl}/api/vehicle?junction_id=${junction_id}`,
+                `${serverUrl}/api/vehicle?junction_id=${props.camera}`,
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,
@@ -63,6 +97,7 @@ export const Table = (props) => {
     useEffect(() => {
         async function fetchAndSetData() {
             const res = await getVehicleDataSecurely(props.camera);
+
             let newData = []
             const entrance_row = {id: "Number of cars entered through this camera", value: res.entrance}
             const exit_row = {id: "Number of cars exiting through this camera", value: res.exit}
@@ -78,8 +113,9 @@ export const Table = (props) => {
             }
 
             setVehicleData(newData);
+            currentVehicleData = newData;
 
-            initSocket(props.camera, newData, setVehicleData);
+            //initSocket(props.camera, newData, setVehicleData);
         }
         fetchAndSetData()
     }, [props.camera])
