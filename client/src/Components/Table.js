@@ -4,7 +4,6 @@ import { makeStyles, Paper } from '@material-ui/core';
 import { DataGrid } from '@material-ui/data-grid';
 import config from '../config.json';
 import { initSocket } from '../Components/Socket.js';
-import { io } from 'socket.io-client';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -32,38 +31,6 @@ export const Table = (props) => {
     ]
 
     const [vehicleData, setVehicleData] = useState([]);
-    let currentVehicleData;
-
-    function onMessage(e) {
-        // check if vehicle data is for junction currently in view
-        if(e.junction_id != props.camera) {
-            return;
-        }
-
-        // update fields that have changed
-        // find row in vehicle data where id matches field to be updated
-        for(const row of currentVehicleData) {
-            for(const field of e.fields) {
-                if(row.id == field) {
-                    row.value++;
-                }
-            }
-        }
-        // set table data
-        setVehicleData(currentVehicleData);
-    }
-
-    function makeSocket() {    
-        // initialise socket for updating data in real time
-        let socket = io(serverUrl);
-    
-        socket.on("vehicleDataUpdate", onMessage);
-    
-        socket.on("connect", () => {
-            console.log("socket connected");
-        })
-    }
-
 
     /**
      * Gets the vehicle data based on the current junction in view
@@ -75,8 +42,6 @@ export const Table = (props) => {
                 audience: config.auth.api.identifier,
                 scope: "read:vehicle"
             });
-
-            makeSocket();
 
             // get initial data
             const response = await fetch(
@@ -113,9 +78,8 @@ export const Table = (props) => {
             }
 
             setVehicleData(newData);
-            currentVehicleData = newData;
 
-            //initSocket(props.camera, newData, setVehicleData);
+            initSocket(props.camera, newData, setVehicleData);
         }
         fetchAndSetData()
     }, [props.camera])

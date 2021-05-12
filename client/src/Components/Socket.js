@@ -36,7 +36,7 @@ function vehicleDataUpdate(e) {
         }
     }
     // set table data
-    setVehicleData(vehicleData);
+    setVehicleData([...vehicleData]);
 };
 
 export const initSocket = (j_id, vData, set_vData) => {
