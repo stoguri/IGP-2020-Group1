@@ -100,8 +100,11 @@ export default function HomeView() {
                                 title={videoList[0]}
                                 subheader={"started viewing at: " + date.getHours() + ":" + date.getMinutes()}
                             />
-                            <CardMedia>
-                                <video id="videoElement"></video>
+                            <CardMedia style={{height: "40vh"}}>
+                                <video id="videoElement" style={{
+                                    height: "-webkit-fill-available",
+                                    width: "-webkit-fill-available",
+                                    float: "left"}}></video>
                             </CardMedia>
                         </Card>
                     </Grid>
