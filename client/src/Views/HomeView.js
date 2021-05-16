@@ -41,7 +41,6 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-let player;
 export default function HomeView() {
 
     const { isAuthenticated } = useAuth0();
@@ -86,28 +85,11 @@ export default function HomeView() {
         tmp.remove();
     }
 
-    function updateMainStream() {
-        if (flvjs.isSupported()) {
-            if (player) {
-                player.destroy();
-            }
-
-            const videoElement = document.getElementById('mainVideo');
-            player = flvjs.createPlayer({
-                type: 'flv',
-                url: `http://localhost:8000/live/${videoList[0]}.flv`
-            });
-            player.attachMediaElement(videoElement);
-            player.load();
-            player.play();
-        }
-    }
-
     function startLiveStreams() {
         if (flvjs.isSupported()) {
             videoList.slice(0, 4).map((videoId, idx) => {
                 const videoElement = document.getElementById('videoStream' + idx);
-                player = flvjs.createPlayer({
+                const player = flvjs.createPlayer({
                     type: 'flv',
                     url: `http://localhost:8000/live/${videoId}.flv`
                 });
