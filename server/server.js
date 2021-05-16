@@ -130,6 +130,24 @@ app.post('/api/vehicle', checkJwt, checkScopes_writer, async (req, res) => {
     }
 });
 
+
+app.post('/api/vehicle/boundingbox', checkJwt, checkScopes_writer, async (req, res) => {
+    try {
+        // send socket message
+        io.emit("vehicleBoundingBox", {
+            junction_id: req.query.id,
+            height: req.query.height,
+            width: req.query.width,
+            x: req.query.x,
+            y: req.query.y
+        });
+        res.sendStatus(201);
+    } catch (e) {
+        console.error(e);
+        res.status(500);
+    }
+});
+
 /**
  * @api {get} /api/vehicle get vehicle record - using filter fields
  * @apiName GetVehicle

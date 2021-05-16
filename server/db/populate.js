@@ -3,7 +3,7 @@
 
 const MongoClient = require('mongodb').MongoClient;
 const config = require('../../client/src/config.json');
-const testData = require('./testData');
+const testData = require('./testData.json');
 
 // connect to database
 const client = new MongoClient(`mongodb://${config.db.domain}:${config.db.port}`,
@@ -18,13 +18,6 @@ client.connect(async(err) => {
 
         // vehicle records
         await db.collection('vehicles').insertMany(testData.vehicles);
-    
-        // user records
-        // strip password out of json
-        for(let i = 0; i < testData.users.length; i++) {
-            delete testData.users[i].password;
-        }
-        await db.collection('users').insertMany(testData.users);
 
         console.log("Database populated");
     }
