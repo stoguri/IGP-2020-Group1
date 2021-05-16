@@ -11,7 +11,6 @@ const jwtAuthz = require('express-jwt-authz');
 const jwksRsa = require('jwks-rsa');
 const crypto = require('crypto');
 // our modules
-const db = require('./db/main.js');
 
 const config = require('../client/src/config.json');
 // validate config.json
