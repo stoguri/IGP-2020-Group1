@@ -1,10 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState} from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { useAuth0 } from '@auth0/auth0-react';
 import { Box, Card, CardHeader, CardMedia, Grid, List, ListItem, Paper } from '@material-ui/core';
 import LogoutTopbar from '../Components/LogoutTopbar';
 import { Table } from '../Components/Table';
-const flvjs = window.flvjs;
 
 /*
 Home page text and photo component
@@ -35,7 +34,6 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-let player;
 export default function HomeView() {
     const { isAuthenticated } = useAuth0();
 
@@ -45,7 +43,6 @@ export default function HomeView() {
 
     // Entrance numbers/id must be defined
     const handleVideoClicks = (props) => {
-        console.log(props)
         const currentOrder = videoList;
         const currentMain = videoList[0];
         if (props === '2') {
@@ -64,30 +61,6 @@ export default function HomeView() {
         setVideoList([...currentOrder]);
     }
 
-    function startLiveStream() {
-        console.log(videoList[0])
-
-        if (flvjs.isSupported()) {
-            if (player) {
-                player.destroy();
-            }
-
-            const videoElement = document.getElementById('videoElement');
-            player = flvjs.createPlayer({
-                type: 'flv',
-                url: `http://localhost:8000/live/${videoList[0]}.flv`
-            });
-            player.attachMediaElement(videoElement);
-            player.load();
-            player.play();
-        }
-    }
-
-    useEffect(() => {
-        // Update the document title using the browser API
-        isAuthenticated && startLiveStream();
-    });
-
     const classes = useStyles();
     return (
         isAuthenticated && (
@@ -100,12 +73,9 @@ export default function HomeView() {
                                 title={videoList[0]}
                                 subheader={"started viewing at: " + date.getHours() + ":" + date.getMinutes()}
                             />
-                            <CardMedia style={{height: "40vh"}}>
-                                <video id="videoElement" style={{
-                                    height: "-webkit-fill-available",
-                                    width: "-webkit-fill-available",
-                                    float: "left"}}></video>
-                            </CardMedia>
+                            <CardMedia
+
+                            />
                         </Card>
                     </Grid>
                     <Grid item xs={5}>
