@@ -1,9 +1,10 @@
-import React, { useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { useAuth0 } from '@auth0/auth0-react';
 import { Box, Card, CardHeader, CardMedia, Grid, List, ListItem, Paper } from '@material-ui/core';
 import LogoutTopbar from '../Components/LogoutTopbar';
 import { Table } from '../Components/Table';
+const flvjs = window.flvjs;
 
 /*
 Home page text and photo component
@@ -31,35 +32,114 @@ const useStyles = makeStyles((theme) => ({
         width: '20%',
         height: '20vh',
         margin: '0 2vw'
+    },
+    videoItem: {
+        height: "-webkit-fill-available",
+        width: "-webkit-fill-available",
+        float: "left",
+        backgroundColor: "black"
     }
 }));
 
 export default function HomeView() {
+
     const { isAuthenticated } = useAuth0();
 
     const [videoList, setVideoList] = useState(["id0", "id1", "id2", "id3", "id4"]);
-    
+
+    const [isLoaded, setIsLoaded] = useState(false);
+
     const date = new Date();
 
     // Entrance numbers/id must be defined
-    const handleVideoClicks = (props) => {
-        const currentOrder = videoList;
-        const currentMain = videoList[0];
-        if (props === '2') {
-            currentOrder[0] = currentOrder[1];
-            currentOrder[1] = currentMain;
-        } else if (props === '3') {
-            currentOrder[0] = currentOrder[2];
-            currentOrder[2] = currentMain;
-        } else if (props === '4') {
-            currentOrder[0] = currentOrder[3];
-            currentOrder[3] = currentMain;
-        } else if (props === '5') {
-            currentOrder[0] = currentOrder[4];
-            currentOrder[4] = currentMain;
-        }
-        setVideoList([...currentOrder]);
+    const handleVideoClicks = (pos) => {
+        const newVideoList = [...videoList];
+
+        // swap the clicked videoId with the main videoId
+        const currentMain = newVideoList[0];
+        newVideoList[0] = newVideoList[pos];
+        newVideoList[pos] = currentMain;
+
+        /*
+            when the video elements are swapped, naturally the video.id attributes
+            swap with the videos, meaning the position of the on-screen video 
+            no longer corresponds to the video.id (aka idx)
+            
+            to access the correct idx
+            - the video position provided onclick is used to obtain the first videoId
+            - the first videoId is used to obtain the first idx
+            - the main videoId is used to obtain the second idx 
+        */
+        swapVideos(parseInt(videoList[pos].match(/\d/g)[0]), parseInt(currentMain.match(/\d/g)[0]))
+        setVideoList(newVideoList);
     }
+
+    function swapVideos(idx1, idx2) {
+        const video1 = document.getElementById('videoStream' + idx1);
+        const video2 = document.getElementById('videoStream' + idx2);
+
+        const tmp = document.createElement('div');
+        video1.parentElement.insertBefore(tmp, video1);
+        video2.parentElement.insertBefore(video1, video2);
+        tmp.parentElement.insertBefore(video2, tmp);
+        tmp.remove();
+    }
+
+    function startLiveStreams() {
+        if (flvjs.isSupported()) {
+            videoList.slice(0, 4).map((videoId, idx) => {
+                const videoElement = document.getElementById('videoStream' + idx);
+                const player = flvjs.createPlayer({
+                    type: 'flv',
+                    url: `http://localhost:8000/live/${videoId}.flv`
+                });
+                player.attachMediaElement(videoElement);
+                player.load();
+                player.play();
+            })
+        }
+    }
+
+    function videoElement(idx) {
+        /* 
+            why use idx instead of videoId in the video.id attribute?
+
+            using videoId will cause the video.id attribute to update
+            during useEffect which is unwanted behaviour - the video ids 
+            must stay fixed for the video swapping
+        */
+        return <video id={"videoStream" + idx} className={classes.videoItem}></video>
+    }
+
+    function listSubVideos() {
+        return videoList.slice(1, 4).map((videoId, _idx) => {
+            // increment to correct video index
+            const idx = _idx+1;
+
+            return (
+                <Paper key={idx} className={classes.videoListItem}
+                    onClick={() => { handleVideoClicks(idx) }} elevation={10}
+                >
+                    <ListItem>{videoId}</ListItem>
+                    <ListItem style={{ height: "17vh" }}>
+                        {videoElement(idx)}
+                    </ListItem>
+                </Paper>
+            )
+        });
+    }
+
+
+    useEffect(() => {
+        // Update the document title using the browser API
+        if (isAuthenticated) {
+            if (!isLoaded) {
+                startLiveStreams();
+                setIsLoaded(true);
+            }
+
+        }
+    });
 
     const classes = useStyles();
     return (
@@ -73,36 +153,17 @@ export default function HomeView() {
                                 title={videoList[0]}
                                 subheader={"started viewing at: " + date.getHours() + ":" + date.getMinutes()}
                             />
-                            <CardMedia
-
-                            />
+                            <CardMedia style={{ height: "40vh" }}>
+                                {videoElement(0)}
+                            </CardMedia>
                         </Card>
                     </Grid>
                     <Grid item xs={5}>
-                        <Table camera={videoList[0]}/>
+                        <Table camera={videoList[0]} />
                     </Grid>
                     <Grid item xs={12}>
                         <List className={classes.videoList}>
-                            <Paper className={classes.videoListItem} onClick={() => { handleVideoClicks('2') }} elevation={10}>
-                                <ListItem>
-                                    {videoList[1]}
-                                </ListItem>
-                            </Paper>
-                            <Paper className={classes.videoListItem} onClick={() => { handleVideoClicks('3') }} elevation={10}>
-                                <ListItem>
-                                    {videoList[2]}
-                                </ListItem>
-                            </Paper>
-                            <Paper className={classes.videoListItem} onClick={() => { handleVideoClicks('4') }} elevation={10}>
-                                <ListItem>
-                                    {videoList[3]}
-                                </ListItem>
-                            </Paper>
-                            <Paper className={classes.videoListItem} elevation={10}>
-                                <ListItem>
-                                    {videoList[4]}
-                                </ListItem>
-                            </Paper>
+                            {listSubVideos()}
                         </List>
                     </Grid>
                 </Grid>
