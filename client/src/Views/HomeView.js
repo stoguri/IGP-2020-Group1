@@ -100,34 +100,27 @@ export default function HomeView(props) {
     }
 
     function drawBoundingBox(message) {
-        // {
-        //     junction_id: req.query.id,
-        //     height: req.query.height,
-        //     width: req.query.width,
-        //     x: req.query.x,
-        //     y: req.query.y
-        // }
-
         console.log(message);
+        const boxId = 'boundingBox' + message.junction_id;
+        let boundingBox = document.getElementById(boxId);
+        if (boundingBox) {
+            boundingBox.remove();
+        }
         
         const video = document.getElementById('videoStream' + message.junction_id.match(/\d/g)[0]);
+        if (video) {
+            const videoPos = video.getBoundingClientRect();
         
-        console.log(video);
-
-        const videoPos = video.getBoundingClientRect();
-
-        console.log(videoPos);
-
-        const boundingBox = document.createElement('div');
-        boundingBox.style.position = 'fixed';
-        boundingBox.style.left = (videoPos.left + message.x) + 'px';
-        boundingBox.style.top = (videoPos.top + message.y) + 'px';
-        boundingBox.style.height = message.height + 'px';
-        boundingBox.style.width = message.width + 'px';
-        boundingBox.style.border = '1px solid red';
-        document.body.appendChild(boundingBox);
-
-        console.log(boundingBox);
+            boundingBox = document.createElement('div');
+            boundingBox.style.position = 'fixed';
+            boundingBox.style.left = (videoPos.left + message.x) + 'px';
+            boundingBox.style.top = (videoPos.top + message.y) + 'px';
+            boundingBox.style.height = message.height + 'px';
+            boundingBox.style.width = message.width + 'px';
+            boundingBox.style.border = '1px solid red';
+            boundingBox.id = boxId;
+            document.body.appendChild(boundingBox);
+        }
     }
 
     props.socket.on('vehicleBoundingBox', drawBoundingBox)

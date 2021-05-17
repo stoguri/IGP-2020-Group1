@@ -88,16 +88,6 @@ io.on('connection', (socket) => {
     */
 });
 
-setInterval(() => {
-    io.emit('vehicleBoundingBox', {
-        junction_id: 'id0',
-        height: 100,
-        width: 100,
-        x: 20,
-        y: 20
-    })
-}, 2000);
-
 // %%% API routes and functions %%%
 
 /**
@@ -308,3 +298,54 @@ if (config.operationMode == "audit") {
 }
 
 module.exports = app;
+
+/*
+    demos
+*/
+
+function vehicleBoundingBoxDemo() {
+    let boundId0 = {
+        junction_id: 'id0',
+        height: 100,
+        width: 100,
+        x: 20,
+        y: 20
+    };
+
+    setInterval(() => {
+        io.emit('vehicleBoundingBox', boundId0)
+        boundId0.height += 10;
+        boundId0.width += 20;
+        boundId0.x += 10;
+        boundId0.y += 20;
+
+        for (let key in boundId0) {
+            if (boundId0[key] > 100) {
+                boundId0[key] = 10;
+            }
+        }
+    }, 1000);
+
+    let boundId2 = {
+        junction_id: 'id2',
+        height: 40,
+        width: 30,
+        x: 120,
+        y: 50
+    };
+
+    setInterval(() => {
+        io.emit('vehicleBoundingBox', boundId2)
+        boundId2.height -= 5;
+        boundId2.width -= 10;
+        boundId2.x -= 5;
+        boundId2.y -= 10;
+
+        for (let key in boundId2) {
+            if (boundId2[key] < 15) {
+                boundId2[key] = 50;
+            }
+        }
+    }, 1000);
+}
+vehicleBoundingBoxDemo()
