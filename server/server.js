@@ -86,7 +86,17 @@ io.on('connection', (socket) => {
         fields: ["Number of cars entered through this camera", "id0->id1"]
     });
     */
-})
+});
+
+setInterval(() => {
+    io.emit('vehicleBoundingBox', {
+        junction_id: 'id0',
+        height: 100,
+        width: 100,
+        x: 20,
+        y: 20
+    })
+}, 2000);
 
 // %%% API routes and functions %%%
 

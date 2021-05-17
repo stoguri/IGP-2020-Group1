@@ -41,8 +41,7 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-export default function HomeView() {
-
+export default function HomeView(props) {
     const { isAuthenticated } = useAuth0();
 
     const [videoList, setVideoList] = useState(["id0", "id1", "id2", "id3", "id4"]);
@@ -99,6 +98,39 @@ export default function HomeView() {
             })
         }
     }
+
+    function drawBoundingBox(message) {
+        // {
+        //     junction_id: req.query.id,
+        //     height: req.query.height,
+        //     width: req.query.width,
+        //     x: req.query.x,
+        //     y: req.query.y
+        // }
+
+        console.log(message);
+        
+        const video = document.getElementById('videoStream' + message.junction_id.match(/\d/g)[0]);
+        
+        console.log(video);
+
+        const videoPos = video.getBoundingClientRect();
+
+        console.log(videoPos);
+
+        const boundingBox = document.createElement('div');
+        boundingBox.style.position = 'fixed';
+        boundingBox.style.left = (videoPos.left + message.x) + 'px';
+        boundingBox.style.top = (videoPos.top + message.y) + 'px';
+        boundingBox.style.height = message.height + 'px';
+        boundingBox.style.width = message.width + 'px';
+        boundingBox.style.border = '1px solid red';
+        document.body.appendChild(boundingBox);
+
+        console.log(boundingBox);
+    }
+
+    props.socket.on('vehicleBoundingBox', drawBoundingBox)
 
     function videoElement(idx) {
         /* 
@@ -159,7 +191,7 @@ export default function HomeView() {
                         </Card>
                     </Grid>
                     <Grid item xs={5}>
-                        <Table camera={videoList[0]} />
+                        <Table camera={videoList[0]} socket={props.socket} serverUrl={props.serverUrl} />
                     </Grid>
                     <Grid item xs={12}>
                         <List className={classes.videoList}>
