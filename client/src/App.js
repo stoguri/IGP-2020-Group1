@@ -1,11 +1,9 @@
 import React from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
-import { makeStyles } from '@material-ui/core/styles'
-import { Box, Typography } from '@material-ui/core'
-import HomeView from './Views/HomeView'
-import LoginView from './Views/LoginView'
-
-
+import { makeStyles } from '@material-ui/core/styles';
+import { Box, Typography } from '@material-ui/core';
+import HomeView from './Views/HomeView';
+import LoginView from './Views/LoginView';
 
 /*
 Single Page Application - Dynamically render components into this view from './Components'
@@ -41,7 +39,7 @@ export default function App(props) {
     return (
         <Box className={classes.wrapper}>
             <LoginView />
-            <HomeView/>
+            <HomeView socket={props.socket} serverUrl={props.serverUrl}/>
         </Box>
     );
 }

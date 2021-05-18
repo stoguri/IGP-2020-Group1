@@ -86,7 +86,7 @@ io.on('connection', (socket) => {
         fields: ["Number of cars entered through this camera", "id0->id1"]
     });
     */
-})
+});
 
 // %%% API routes and functions %%%
 
@@ -298,3 +298,60 @@ if (config.operationMode == "audit") {
 }
 
 module.exports = app;
+
+/*
+    demos
+*/
+
+function vehicleBoundingBoxDemo() {
+    let boundId0 = {
+        junction_id: 'id0',
+        height: 100,
+        width: 100,
+        x: 20,
+        y: 20,
+    };
+
+    setInterval(() => {
+        io.emit('vehicleBoundingBox', boundId0)
+        boundId0.height += 50;
+        boundId0.width += 100;
+        boundId0.x += 50;
+        boundId0.y += 100;
+
+        for (let key in boundId0) {
+            if (boundId0[key] > 400) {
+                boundId0[key] = 10;
+            }
+        }
+
+        boundId0.oWidth = 1920;
+        boundId0.oHeight = 1080;
+    }, 1000);
+
+    let boundId2 = {
+        junction_id: 'id2',
+        height: 100,
+        width: 100,
+        x: 20,
+        y: 20,
+    };
+
+    setInterval(() => {
+        io.emit('vehicleBoundingBox', boundId2)
+        boundId2.height += 50;
+        boundId2.width += 100;
+        boundId2.x += 50;
+        boundId2.y += 100;
+
+        for (let key in boundId2) {
+            if (boundId2[key] > 400) {
+                boundId2[key] = 10;
+            }
+        }
+
+        boundId2.oWidth = 1920;
+        boundId2.oHeight = 1080;
+    }, 1000);
+}
+vehicleBoundingBoxDemo()

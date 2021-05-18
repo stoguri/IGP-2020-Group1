@@ -41,8 +41,7 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-export default function HomeView() {
-
+export default function HomeView(props) {
     const { isAuthenticated } = useAuth0();
 
     const [videoList, setVideoList] = useState(["id0", "id1", "id2", "id3", "id4"]);
@@ -100,6 +99,57 @@ export default function HomeView() {
         }
     }
 
+    function drawBoundingBox(message) {
+        const boxId = 'boundingBox' + message.junction_id;
+        let box = document.getElementById(boxId);
+        if (box) {
+            box.remove();
+        }
+        
+        const video = document.getElementById('videoStream' + message.junction_id.match(/\d/g)[0]);
+        if (video) {
+            const videoPos = video.getBoundingClientRect();
+
+            const origRatio = message.oHeight / message.oWidth;
+            const newRatio = videoPos.height / videoPos.width;
+
+            const boxProps = {};
+            let scale;
+
+            if (origRatio > newRatio) {
+                // original video has taller aspect ratio, video elem has horizontal edges
+                scale = videoPos.height / message.oHeight;
+                const hEdge = (videoPos.width - (scale * message.oWidth)) / 2
+
+                boxProps.left =  hEdge + videoPos.left + (scale * message.x); 
+                boxProps.top = videoPos.top + (scale * message.y);
+            } else {
+                // original video has wider aspect ratio, video elem has vertical edges
+                scale = videoPos.width / message.oWidth;
+                const vEdge = (videoPos.height - (scale * message.oHeight)) / 2
+                
+                boxProps.left = videoPos.left + (scale * message.x);
+                boxProps.top =  vEdge + videoPos.top + (scale * message.y); 
+            }
+
+            
+            boxProps.width = scale * message.width;
+            boxProps.height = scale * message.height;
+ 
+            box = document.createElement('div');
+            box.style.position = 'fixed';
+            box.style.left = boxProps.left + 'px';
+            box.style.top = boxProps.top + 'px';
+            box.style.height = boxProps.height + 'px';
+            box.style.width = boxProps.width + 'px';
+            box.style.border = '1px solid red';
+            box.id = boxId;
+            document.body.appendChild(box);
+        }
+    }
+
+    props.socket.on('vehicleBoundingBox', drawBoundingBox)
+
     function videoElement(idx) {
         /* 
             why use idx instead of videoId in the video.id attribute?
@@ -128,7 +178,6 @@ export default function HomeView() {
             )
         });
     }
-
 
     useEffect(() => {
         // Update the document title using the browser API
@@ -159,7 +208,7 @@ export default function HomeView() {
                         </Card>
                     </Grid>
                     <Grid item xs={5}>
-                        <Table camera={videoList[0]} />
+                        <Table camera={videoList[0]} socket={props.socket} serverUrl={props.serverUrl} />
                     </Grid>
                     <Grid item xs={12}>
                         <List className={classes.videoList}>
