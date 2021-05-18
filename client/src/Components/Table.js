@@ -89,23 +89,23 @@ export const Table = (props) => {
 
     useEffect(() => {
         async function fetchAndSetData() {
-            // const res = await getVehicleDataSecurely(props.camera);
+            const res = await getVehicleDataSecurely(props.camera);
 
-            // let newData = []
-            // const entrance_row = {id: "Number of cars entered through this camera", value: res.entrance}
-            // const exit_row = {id: "Number of cars exiting through this camera", value: res.exit}
-            // newData.push(entrance_row)
-            // newData.push(exit_row)
-            // const routes = res.route
-            // const route_keys = Object.keys(routes)
-            // const header = { id: 'Routes: ', value: '' }
-            // newData.push(header);
-            // for (let i = 0; i < route_keys.length; i++) {
-            //     const row = { id: `${route_keys[i]}`, value: `${routes[route_keys[i]]}` }
-            //     newData.push(row);
-            // }
+            let newData = []
+            const entrance_row = {id: "Number of cars entered through this camera", value: res.entrance}
+            const exit_row = {id: "Number of cars exiting through this camera", value: res.exit}
+            newData.push(entrance_row)
+            newData.push(exit_row)
+            const routes = res.route
+            const route_keys = Object.keys(routes)
+            const header = { id: 'Routes: ', value: '' }
+            newData.push(header);
+            for (let i = 0; i < route_keys.length; i++) {
+                const row = { id: `${route_keys[i]}`, value: `${routes[route_keys[i]]}` }
+                newData.push(row);
+            }
 
-            // setVehicleData(newData);
+            setVehicleData(newData);
         }
         fetchAndSetData()
     }, [props.camera])

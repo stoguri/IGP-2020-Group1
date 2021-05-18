@@ -100,26 +100,51 @@ export default function HomeView(props) {
     }
 
     function drawBoundingBox(message) {
-        console.log(message);
         const boxId = 'boundingBox' + message.junction_id;
-        let boundingBox = document.getElementById(boxId);
-        if (boundingBox) {
-            boundingBox.remove();
+        let box = document.getElementById(boxId);
+        if (box) {
+            box.remove();
         }
         
         const video = document.getElementById('videoStream' + message.junction_id.match(/\d/g)[0]);
         if (video) {
             const videoPos = video.getBoundingClientRect();
-        
-            boundingBox = document.createElement('div');
-            boundingBox.style.position = 'fixed';
-            boundingBox.style.left = (videoPos.left + message.x) + 'px';
-            boundingBox.style.top = (videoPos.top + message.y) + 'px';
-            boundingBox.style.height = message.height + 'px';
-            boundingBox.style.width = message.width + 'px';
-            boundingBox.style.border = '1px solid red';
-            boundingBox.id = boxId;
-            document.body.appendChild(boundingBox);
+
+            const origRatio = message.oHeight / message.oWidth;
+            const newRatio = videoPos.height / videoPos.width;
+
+            const boxProps = {};
+            let scale;
+
+            if (origRatio > newRatio) {
+                // original video has taller aspect ratio, video elem has horizontal edges
+                scale = videoPos.height / message.oHeight;
+                const hEdge = (videoPos.width - (scale * message.oWidth)) / 2
+
+                boxProps.left =  hEdge + videoPos.left + (scale * message.x); 
+                boxProps.top = videoPos.top + (scale * message.y);
+            } else {
+                // original video has wider aspect ratio, video elem has vertical edges
+                scale = videoPos.width / message.oWidth;
+                const vEdge = (videoPos.height - (scale * message.oHeight)) / 2
+                
+                boxProps.left = videoPos.left + (scale * message.x);
+                boxProps.top =  vEdge + videoPos.top + (scale * message.y); 
+            }
+
+            
+            boxProps.width = scale * message.width;
+            boxProps.height = scale * message.height;
+ 
+            box = document.createElement('div');
+            box.style.position = 'fixed';
+            box.style.left = boxProps.left + 'px';
+            box.style.top = boxProps.top + 'px';
+            box.style.height = boxProps.height + 'px';
+            box.style.width = boxProps.width + 'px';
+            box.style.border = '1px solid red';
+            box.id = boxId;
+            document.body.appendChild(box);
         }
     }
 
@@ -153,7 +178,6 @@ export default function HomeView(props) {
             )
         });
     }
-
 
     useEffect(() => {
         // Update the document title using the browser API
