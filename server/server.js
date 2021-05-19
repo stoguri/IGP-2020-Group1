@@ -105,6 +105,8 @@ io.on('connection', (socket) => {
  * @apiFailure {status} 401, 403, 500
  */
 app.post('/api/vehicle', checkJwt, checkScopes_writer, async (req, res) => {
+    console.log("new vehicle");
+    console.log(req.query);
     try {
         const status = await db.newVehicle(req.query.identifier, 
             req.query.entrance_id, parseFloat(req.query.entrance_time),
@@ -133,10 +135,13 @@ app.post('/api/vehicle', checkJwt, checkScopes_writer, async (req, res) => {
 
 
 app.post('/api/vehicle/boundingbox', checkJwt, checkScopes_writer, async (req, res) => {
+    console.log("update bounding box");
+    console.log(req.query);
     try {
         // send socket message
         io.emit("vehicleBoundingBox", {
             junction_id: req.query.id,
+            time: req.query.time,
             height: req.query.height,
             width: req.query.width,
             x: req.query.x,
