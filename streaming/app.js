@@ -16,7 +16,8 @@ const config = {
   relay: {
     ffmpeg: '/usr/bin/ffmpeg',
     tasks: []
-  }
+  },
+  logType: 3
 };
 
 let port = 8554;
@@ -24,6 +25,7 @@ for(const entrance of appConfig.entrances) {
     config.relay.tasks.push({
       app: 'live',
       mode: 'static',
+      //edge: `rtsp://chungus.co.uk:${port}/${entrance}`, // for accessing from external source
       edge: `rtsp://localhost:${port}/${entrance}`,
       name: entrance, 
       rtsp_transport: ['udp', 'tcp', 'udp_multicast', 'http'],
@@ -32,8 +34,6 @@ for(const entrance of appConfig.entrances) {
 
     port++;
 }
-
-console.log(config.relay.tasks);
 
 var nms = new NodeMediaServer(config)
 nms.run();
