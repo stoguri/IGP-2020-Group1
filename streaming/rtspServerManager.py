@@ -3,10 +3,10 @@ import time
 import optparse
 
 streams = [
-    {'name': 'id0', 'source': 'C2.mp4', 'port': 8554},
-    {'name': 'id1', 'source': 'Sam2.mp4', 'port': 8555},
-    {'name': 'id2', 'source': 'Nat2.mp4', 'port': 8556},
-    {'name': 'id3', 'source': 'S2.mp4', 'port': 8557}
+    {'name': 'id0', 'source': 'Sam2.mp4', 'port': 8554},
+    {'name': 'id1', 'source': 'C2.mp4', 'port': 8555},
+    {'name': 'id2', 'source': 'S2.mp4', 'port': 8556},
+    {'name': 'id3', 'source': 'Nat2.mp4', 'port': 8557}
 ]
 
 pids = []

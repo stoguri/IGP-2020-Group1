@@ -6,6 +6,21 @@ import App from './App.js';
 import reportWebVitals from './Services/Logging/reportWebVitals';
 import config from './config.json';
 import { io } from 'socket.io-client';
+import { initSocket } from './Components/Socket.js'; 
+import {SocketContext, socket} from './context/socket.js';
+//import Child from 'components/Child';
+
+/*
+const App = () => {
+  return (
+    <SocketContext.Provider value={socket}>
+      <Child />
+      <Child />
+      ...
+    </SocketContext.Provider
+  );
+};
+*/
 
 let serverUrl;
 if (config.network.server.https) {
@@ -14,16 +29,29 @@ if (config.network.server.https) {
     serverUrl = `http://${config.network.server.domain}:${config.network.server.http.port}`;
 }
 
-function initSocket() {
-    const socket = io(serverUrl);
-    socket.on("connect", () => {
-        console.log("socket connected");
-    });
-
-    return socket;
-}
-
 // Render App component into the browser
+ReactDOM.render(
+  <SocketContext.Provider value={socket}>
+    <Auth0ProviderWithHistory>
+      <App serverUrl={serverUrl}/>
+    </Auth0ProviderWithHistory>
+  </SocketContext.Provider>,
+  document.getElementById('root')
+);
+
+/*
+ReactDOM.render(
+  <SocketContext.Provider value={socket}>
+    <Router>
+      <Auth0ProviderWithHistory>
+        <App serverUrl={serverUrl}/>
+      </Auth0ProviderWithHistory>
+    </Router>
+  </SocketContext.Provider>,
+  document.getElementById('root')
+);
+*/
+/*
 ReactDOM.render(
   <Router>
     <Auth0ProviderWithHistory>
@@ -32,5 +60,6 @@ ReactDOM.render(
   </Router>,
   document.getElementById('root')
 );
+*/
 
 reportWebVitals(console.log);

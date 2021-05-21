@@ -1,8 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext, useCallback } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 import { makeStyles, Paper } from '@material-ui/core';
 import { DataGrid } from '@material-ui/data-grid';
+import { initSocket, setSocket_vehicleData } from './Socket.js'; 
 import config from '../config.json';
+import { SocketContext } from '../context/socket.js';
+
+let v_data;
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -23,6 +27,10 @@ export const Table = (props) => {
     ]
 
     const [vehicleData, setVehicleData] = useState([]);
+
+    const socket = useContext(SocketContext);
+    //console.log("socket");
+    //console.log(socket);
 
     /**
      * Gets the vehicle data based on the current junction in view
@@ -53,6 +61,7 @@ export const Table = (props) => {
 
     function vehicleDataUpdate(message) {
         console.log("vehicle data update received");
+        //console.log(v_data);
     
         /* data structure
          * fields value is incremented by 1 if given
@@ -69,23 +78,24 @@ export const Table = (props) => {
     
         // update fields that have changed
         // find row in vehicle data where id matches field to be updated
-        for(const row of vehicleData) {
+        for(const row of v_data) {
             for(const field of message.fields) {
                 if(row.id == field) {
+                    //row.value = message.fields[field];
                     row.value++;
                 }
             }
         }
         const newData = [];
         // spread data without creating copy
-        for(let i = 0; i < vehicleData.length; i++) {
-            newData[i] = {...vehicleData[i]};
+        for(let i = 0; i < v_data.length; i++) {
+            newData[i] = {...v_data[i]};
         }
         // set table data
         setVehicleData(newData);
     };
 
-    props.socket.on("vehicleDataUpdate", vehicleDataUpdate);
+    //props.socket.on("vehicleDataUpdate", vehicleDataUpdate);
 
     useEffect(() => {
         async function fetchAndSetData() {
@@ -105,10 +115,17 @@ export const Table = (props) => {
                 newData.push(row);
             }
 
+            //initSocket();
+            //setSocket_vehicleData(props.camera, newData, setVehicleData);
+
             setVehicleData(newData);
+
+            socket.on("vehicleDataUpdate", vehicleDataUpdate);
+
+            v_data = newData;
         }
         fetchAndSetData()
-    }, [props.camera])
+    }, [socket, props.camera])
 
     const classes = useStyles();
     return (

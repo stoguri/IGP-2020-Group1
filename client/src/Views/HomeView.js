@@ -1,10 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext, useCallback } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { useAuth0 } from '@auth0/auth0-react';
 import { Box, Card, CardHeader, CardMedia, Grid, List, ListItem, Paper } from '@material-ui/core';
 import LogoutTopbar from '../Components/LogoutTopbar';
 import { Table } from '../Components/Table';
+import { initSocket_boundingBox } from '../Components/Socket.js'; 
+import {SocketContext} from '../context/socket';
 const flvjs = window.flvjs;
+const boundingBoxQueue = [];
+let lastRecievedStreamTime = 0;
 
 /*
 Home page text and photo component
@@ -47,6 +51,10 @@ export default function HomeView(props) {
     const [videoList, setVideoList] = useState(["id0", "id1", "id2", "id3", "id4"]);
 
     const [isLoaded, setIsLoaded] = useState(false);
+
+    const socket = useContext(SocketContext);
+    socket.on('vehicleBoundingBox', drawBoundingBox);
+    //socket.on('vehicleBoundingBox', pushToBoundingBoxQueue);
 
     const date = new Date();
 
@@ -98,58 +106,7 @@ export default function HomeView(props) {
             })
         }
     }
-
-    function drawBoundingBox(message) {
-        const boxId = 'boundingBox' + message.junction_id;
-        let box = document.getElementById(boxId);
-        if (box) {
-            box.remove();
-        }
-        
-        const video = document.getElementById('videoStream' + message.junction_id.match(/\d/g)[0]);
-        if (video) {
-            const videoPos = video.getBoundingClientRect();
-
-            const origRatio = message.sourceHeight / message.sourceWidth;
-            const newRatio = videoPos.height / videoPos.width;
-
-            const boxProps = {};
-            let scale;
-
-            if (origRatio > newRatio) {
-                // original video has taller aspect ratio, video elem has horizontal edges
-                scale = videoPos.height / message.sourceHeight;
-                const hEdge = (videoPos.width - (scale * message.sourceWidth)) / 2
-
-                boxProps.left =  hEdge + videoPos.left + (scale * message.x); 
-                boxProps.top = videoPos.top + (scale * message.y);
-            } else {
-                // original video has wider aspect ratio, video elem has vertical edges
-                scale = videoPos.width / message.sourceWidth;
-                const vEdge = (videoPos.height - (scale * message.sourceHeight)) / 2
-                
-                boxProps.left = videoPos.left + (scale * message.x);
-                boxProps.top =  vEdge + videoPos.top + (scale * message.y); 
-            }
-
-            
-            boxProps.width = scale * message.width;
-            boxProps.height = scale * message.height;
- 
-            box = document.createElement('div');
-            box.style.position = 'fixed';
-            box.style.left = boxProps.left + 'px';
-            box.style.top = boxProps.top + 'px';
-            box.style.height = boxProps.height + 'px';
-            box.style.width = boxProps.width + 'px';
-            box.style.border = '1px solid red';
-            box.id = boxId;
-            document.body.appendChild(box);
-        }
-    }
-
-    props.socket.on('vehicleBoundingBox', drawBoundingBox)
-
+    
     function videoElement(idx) {
         /* 
             why use idx instead of videoId in the video.id attribute?
@@ -208,7 +165,7 @@ export default function HomeView(props) {
                         </Card>
                     </Grid>
                     <Grid item xs={5}>
-                        <Table camera={videoList[0]} socket={props.socket} serverUrl={props.serverUrl} />
+                        <Table camera={videoList[0]} serverUrl={props.serverUrl} />
                     </Grid>
                     <Grid item xs={12}>
                         <List className={classes.videoList}>
@@ -220,3 +177,97 @@ export default function HomeView(props) {
         )
     );
 }
+
+/*
+
+    bounding box
+
+*/
+
+// ---------------------------------- make bounding box expire after x seconds
+
+function drawBoundingBox(message, video) {
+    video = document.getElementById('videoStream' + message.junction_id.match(/\d/g)[0]);
+    
+    const boxId = 'boundingBox' + message.junction_id;
+    let box = document.getElementById(boxId);
+    if (box) {
+        box.remove();
+    }
+    
+    const videoPos = video.getBoundingClientRect();
+
+    const origRatio = message.sourceHeight / message.sourceWidth;
+    const newRatio = videoPos.height / videoPos.width;
+
+    const boxProps = {};
+    let scale;
+
+    if (origRatio > newRatio) {
+        // original video has taller aspect ratio, video elem has horizontal edges
+        scale = videoPos.height / message.sourceHeight;
+        const hEdge = (videoPos.width - (scale * message.sourceWidth)) / 2
+
+        boxProps.left =  hEdge + videoPos.left + (scale * message.x); 
+        boxProps.top = videoPos.top + (scale * message.y);
+    } else {
+        // original video has wider aspect ratio, video elem has vertical edges
+        scale = videoPos.width / message.sourceWidth;
+        const vEdge = (videoPos.height - (scale * message.sourceHeight)) / 2
+        
+        boxProps.left = videoPos.left + (scale * message.x);
+        boxProps.top =  vEdge + videoPos.top + (scale * message.y); 
+    }
+
+    boxProps.width = scale * message.width;
+    boxProps.height = scale * message.height;
+
+    box = document.createElement('div');
+    box.style.position = 'fixed';
+    box.style.left = boxProps.left + 'px';
+    box.style.top = boxProps.top + 'px';
+    box.style.height = boxProps.height + 'px';
+    box.style.width = boxProps.width + 'px';
+    box.style.border = '1px solid red';
+    box.id = boxId;
+    document.body.appendChild(box);
+
+    /*
+    setTimeout(() => {
+        box.remove();
+    }, 1000);
+    */
+    setTimeout(() => {
+        //console.log('timeout')
+        if (box) {
+            //console.log('removing box', box)
+        }
+        box && box.remove()
+    }, 1000);
+}
+
+function pushToBoundingBoxQueue(message) {
+    //console.log(message.timestamp, message.junction_id, message);
+    boundingBoxQueue.push(message);
+    lastRecievedStreamTime = message.timestamp;
+}
+
+function checkBoundingBoxQueue() {
+    //console.log(boundingBoxQueue, lastRecievedStreamTime);
+    for (let message of boundingBoxQueue) {
+        const video = document.getElementById('videoStream' + message.junction_id.match(/\d/g)[0]);
+        if(video) {
+            //console.log("----- video time: " + video.currentTime + "\n\n\n");
+        }
+        if (video && video.currentTime + 3.5 >= message.timestamp) {
+            //console.log('popping and drawing', message.timestamp, video.currentTime);
+            drawBoundingBox(message, video);
+            boundingBoxQueue.shift();
+        } else if (lastRecievedStreamTime - message.timestamp > 20) {
+            //console.log(message.timestamp, lastRecievedStreamTime)
+            boundingBoxQueue.shift();
+        }
+    }
+}
+
+setInterval(checkBoundingBoxQueue, 200);

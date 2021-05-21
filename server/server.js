@@ -88,6 +88,14 @@ io.on('connection', (socket) => {
     */
 });
 
+/*
+const namespace_boundingBox = io.of("/boundingBox");
+
+namespace_boundingBox.on("connection", (socket) => {
+   console.log("bounding box socket connection"); 
+});
+*/
+
 // %%% API routes and functions %%%
 
 /**
@@ -112,18 +120,21 @@ app.post('/api/vehicle', checkJwt, checkScopes_writer, async (req, res) => {
             req.query.entrance_id, parseFloat(req.query.entrance_time),
             req.query.exit_id, req.query.exit_time);
 
-        // send socket messages
-        // one for entrance
         io.emit("vehicleDataUpdate", {
             junction_id: req.query.entrance_id,
-            fields: ["Number of cars entered through this camera", 
-                `${req.query.entrance_id}->${req.query.exit_id}`]
+            fields: [
+                "Number of cars entered through this camera",
+                `${req.query.entrance_id}->${req.query.exit_id}`
+            ]
         });
+
         // one for exit
         io.emit("vehicleDataUpdate", {
             junction_id: req.query.exit_id,
-            fields: ["Number of cars exited through this camera", 
-                `${req.query.entrance_id}->${req.query.exit_id}`]
+            fields: [
+                "Number of cars exiting through this camera",
+                `${req.query.entrance_id}->${req.query.exit_id}`
+            ]
         });
 
         res.sendStatus(status);
@@ -309,7 +320,6 @@ module.exports = app;
 /*
     demos
 */
-
 function vehicleBoundingBoxDemo() {
     let boundId0 = {
         junction_id: 'id0',
@@ -317,6 +327,9 @@ function vehicleBoundingBoxDemo() {
         width: 100,
         x: 20,
         y: 20,
+        sourceWidth: 1920,
+        sourceHeight: 1080,
+        timestamp: 0
     };
 
     setInterval(() => {
@@ -325,16 +338,15 @@ function vehicleBoundingBoxDemo() {
         boundId0.width += 100;
         boundId0.x += 50;
         boundId0.y += 100;
+        boundId0.timestamp += 0.5;
 
-        for (let key in boundId0) {
+        for (let key of ['height', 'width', 'x', 'y']) {
             if (boundId0[key] > 400) {
                 boundId0[key] = 10;
             }
         }
-
-        boundId0.oWidth = 1920;
-        boundId0.oHeight = 1080;
-    }, 1000);
+        //console.log('sending bounding box');
+    }, 500);
 
     let boundId2 = {
         junction_id: 'id2',
@@ -342,6 +354,9 @@ function vehicleBoundingBoxDemo() {
         width: 100,
         x: 20,
         y: 20,
+        sourceWidth: 1920,
+        sourceHeight: 1080,
+        timestamp: 0
     };
 
     setInterval(() => {
@@ -350,15 +365,26 @@ function vehicleBoundingBoxDemo() {
         boundId2.width += 100;
         boundId2.x += 50;
         boundId2.y += 100;
+        boundId2.timestamp += 0.5;
 
-        for (let key in boundId2) {
+        for (let key of ['height', 'width', 'x', 'y']) {
             if (boundId2[key] > 400) {
                 boundId2[key] = 10;
             }
         }
-
-        boundId2.oWidth = 1920;
-        boundId2.oHeight = 1080;
-    }, 1000);
+    }, 500);
 }
 //vehicleBoundingBoxDemo()
+
+function vehicleDataDemo() {
+    setInterval(() => {
+        io.emit('vehicleDataUpdate', {
+            junction_id: 'id0',
+            fields: {
+                "Number of cars entered through this camera": 2,
+                "id0->id1": 2
+            }
+        });
+    }, 5000);
+}
+//vehicleDataDemo();

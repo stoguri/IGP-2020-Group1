@@ -39,7 +39,15 @@ export default function App(props) {
     return (
         <Box className={classes.wrapper}>
             <LoginView />
+            <HomeView serverUrl={props.serverUrl}/>
+        </Box>
+    );
+    /*
+    return (
+        <Box className={classes.wrapper}>
+            <LoginView />
             <HomeView socket={props.socket} serverUrl={props.serverUrl}/>
         </Box>
     );
+    */
 }
