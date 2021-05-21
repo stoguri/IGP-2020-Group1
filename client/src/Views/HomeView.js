@@ -110,7 +110,7 @@ export default function HomeView(props) {
         if (video) {
             const videoPos = video.getBoundingClientRect();
 
-            const origRatio = message.oHeight / message.oWidth;
+            const origRatio = message.sourceHeight / message.sourceWidth;
             const newRatio = videoPos.height / videoPos.width;
 
             const boxProps = {};
@@ -118,15 +118,15 @@ export default function HomeView(props) {
 
             if (origRatio > newRatio) {
                 // original video has taller aspect ratio, video elem has horizontal edges
-                scale = videoPos.height / message.oHeight;
-                const hEdge = (videoPos.width - (scale * message.oWidth)) / 2
+                scale = videoPos.height / message.sourceHeight;
+                const hEdge = (videoPos.width - (scale * message.sourceWidth)) / 2
 
                 boxProps.left =  hEdge + videoPos.left + (scale * message.x); 
                 boxProps.top = videoPos.top + (scale * message.y);
             } else {
                 // original video has wider aspect ratio, video elem has vertical edges
-                scale = videoPos.width / message.oWidth;
-                const vEdge = (videoPos.height - (scale * message.oHeight)) / 2
+                scale = videoPos.width / message.sourceWidth;
+                const vEdge = (videoPos.height - (scale * message.sourceHeight)) / 2
                 
                 boxProps.left = videoPos.left + (scale * message.x);
                 boxProps.top =  vEdge + videoPos.top + (scale * message.y); 
@@ -158,7 +158,7 @@ export default function HomeView(props) {
             during useEffect which is unwanted behaviour - the video ids 
             must stay fixed for the video swapping
         */
-        return <video id={"videoStream" + idx} className={classes.videoItem}></video>
+        return <video id={"videoStream" + idx} className={classes.videoItem} muted="muted"></video>
     }
 
     function listSubVideos() {

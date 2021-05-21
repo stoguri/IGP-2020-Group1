@@ -141,7 +141,9 @@ app.post('/api/vehicle/boundingbox', checkJwt, checkScopes_writer, async (req, r
         // send socket message
         io.emit("vehicleBoundingBox", {
             junction_id: req.query.id,
-            time: req.query.time,
+            sourceHeight: req.query.sourceHeight,
+            sourceWidth: req.query.sourceWidth,
+            timestamp: req.query.timestamp,
             height: req.query.height,
             width: req.query.width,
             x: req.query.x,
@@ -359,4 +361,4 @@ function vehicleBoundingBoxDemo() {
         boundId2.oHeight = 1080;
     }, 1000);
 }
-vehicleBoundingBoxDemo()
+//vehicleBoundingBoxDemo()
